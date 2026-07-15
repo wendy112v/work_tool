@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📋접근성팀 공지사항 정리</title>
+    <title>📋 접근성팀 공지사항 정리</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts (Inter) -->
@@ -34,14 +34,14 @@
             <div class="flex items-center gap-3">
                 <span aria-hidden="true" class="text-2xl">📋</span>
                 <div>
-                    <h1 class="text-xl font-bold tracking-tight text-white">Dev Meeting Notes</h1>
-                    <p class="text-xs text-slate-300">공지사항 보드</p>
+                    <h1 class="text-xl font-bold tracking-tight text-white">접근성팀 공지사항 정리</h1>
+                    <p class="text-xs text-slate-300">실시간 연동 공지사항 보드</p>
                 </div>
             </div>
-            <!-- 실시간 상태 표시등 -->
-            <div class="flex items-center gap-2 text-xs bg-slate-800 px-3 py-1.5 rounded-full text-slate-200">
-                <span id="db-status-dot" class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-                <span id="db-status-text">데이터가 클라우드에 연결되어 관리되고 있습니다.</span>
+            <!-- 실시간 상태 표시등 (스크린 리더 실시간 안내 적용) -->
+            <div class="flex items-center gap-2 text-xs bg-slate-800 px-3 py-1.5 rounded-full text-slate-200" aria-live="polite">
+                <span id="db-status-dot" class="w-2 h-2 rounded-full bg-amber-500 animate-pulse" aria-hidden="true"></span>
+                <span id="db-status-text">데이터베이스 연결 상태 확인 중...</span>
             </div>
         </div>
     </header>
@@ -84,7 +84,7 @@
         <!-- 🏷️ 선택된 태그 필터 상태 표시 영역 (a11y 준수) -->
         <div id="active-tag-container" class="hidden items-center gap-2 mb-6 bg-indigo-500/10 border border-indigo-500/20 px-4 py-2 rounded-xl text-xs text-indigo-300 w-fit">
             <span id="active-tag-text"></span>
-            <button onclick="clearTagFilter()" class="font-bold hover:text-white ml-1 p-1 rounded hover:bg-indigo-500/20" aria-label="태그 필터 해제">✕</button>
+            <button onclick="clearTagFilter()" class="font-bold hover:text-white ml-1 p-1 rounded hover:bg-indigo-500/20" aria-label="태그 필터 해제 및 전체 목록 보기">✕</button>
         </div>
 
         <!-- Dynamic Screen Reader Announcements -->
@@ -152,7 +152,7 @@
         let announcements = [];
         let currentCategory = 'all';
         let searchQuery = '';
-        let selectedTag = ''; // 🏷️ 해시태그 필터링 상태 추가
+        let selectedTag = ''; // 🏷️ 해시태그 필터링 상태
         let triggerButton = null;
 
         window.onload = async () => {
@@ -170,7 +170,7 @@
         function initSupabase() {
             try {
                 supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                updateStatus(true, "Cloud Sync Active");
+                updateStatus(true, "클라우드 데이터베이스 연결 완료");
             } catch (err) {
                 updateStatus(false, "DB 연결 실패");
                 console.error(err);
@@ -182,9 +182,9 @@
             const label = document.getElementById("db-status-text");
             label.textContent = text;
             if(isSuccess) {
-                dot.className = "w-2 h-2 rounded-full bg-emerald-500 animate-none";
+                dot.className = "w-2 h-2 rounded-full bg-emerald-500"; // 연결 완료 시 animate-pulse 제거
             } else {
-                dot.className = "w-2 h-2 rounded-full bg-rose-500 animate-none";
+                dot.className = "w-2 h-2 rounded-full bg-rose-500 animate-pulse";
             }
         }
 
@@ -224,7 +224,7 @@
             srAnnouncement.textContent = `태그 #${tag} 필터가 활성화되었습니다.`;
         }
 
-        // 🏷️ 해시태그 필터 해제
+        // 🏷️ 해시태그 필터 해제 (초점 복원 로직 추가)
         function clearTagFilter() {
             selectedTag = '';
             const container = document.getElementById('active-tag-container');
@@ -235,6 +235,9 @@
             
             const srAnnouncement = document.getElementById('sr-announcement');
             srAnnouncement.textContent = `태그 필터가 해제되어 전체 목록이 표시됩니다.`;
+
+            // ♿ 초점 유실 방지: 필터 제거 후 검색 인풋으로 즉시 포커스 유도
+            document.getElementById('search-input').focus();
         }
 
         // 필터링 및 리스트 화면 렌더링
@@ -249,7 +252,6 @@
                     item.content.toLowerCase().includes(searchQuery) ||
                     (item.tags && item.tags.some(tag => tag.toLowerCase().includes(searchQuery)))
                 );
-                // 태그 필터 규칙 병합
                 const matchesTag = !selectedTag || (item.tags && item.tags.includes(selectedTag));
 
                 return matchesCategory && matchesSearch && matchesTag;
@@ -285,9 +287,9 @@
 
                 const formattedDate = new Date(item.created_at || item.date).toISOString().split('T')[0];
 
-                // ♿ 태그를 키보드 탭 및 인터랙션이 가능한 버튼으로 마크업 변경
+                // ♿ 태그 버튼 명세화 (aria-label 구체화)
                 const tagBadges = (item.tags || []).map(tag => `
-                    <button onclick="filterByTag('${tag}')" class="text-xs text-indigo-300 bg-indigo-500/5 hover:bg-indigo-500/20 border border-indigo-500/10 px-2 py-0.5 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-400" aria-label="태그 ${tag} 필터링 적용">
+                    <button onclick="filterByTag('${tag}')" class="text-xs text-indigo-300 bg-indigo-500/5 hover:bg-indigo-500/20 border border-indigo-500/10 px-2 py-0.5 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-400" aria-label="${tag} 태그 관련 공지 모아보기">
                         #${tag}
                     </button>
                 `).join(' ');
