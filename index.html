@@ -23,6 +23,7 @@
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen">
 
+    <!-- 1. 키보드 사용자용 스킵 링크 -->
     <a href="#main-content" class="skip-link absolute top-0 left-0 bg-indigo-600 text-white px-4 py-2 rounded-b-lg z-[100] transform -translate-y-full transition-transform focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-white">
         본문 바로가기
     </a>
@@ -49,7 +50,7 @@
     <main id="main-content" class="max-w-4xl mx-auto px-4 py-8" tabindex="-1">
         
         <!-- Search & Filter Controls -->
-        <section class="bg-slate-800/50 border border-slate-800 rounded-2xl p-6 mb-8 backdrop-blur-sm" aria-label="검색 및 카테고리 필터">
+        <section class="bg-slate-800/50 border border-slate-800 rounded-2xl p-6 mb-6 backdrop-blur-sm" aria-label="검색 및 카테고리 필터">
             <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
                 
                 <!-- Search Input & Add Button -->
@@ -70,15 +71,21 @@
                     </button>
                 </div>
 
-                <!-- Category Tabs -->
+                <!-- Category Tabs (WAI-ARIA) -->
                 <div role="tablist" aria-label="공지사항 카테고리 필터" class="flex flex-wrap gap-2 w-full md:w-auto">
                     <button role="tab" aria-selected="true" aria-controls="announcement-list" id="tab-all" onclick="filterCategory('all')" class="tab-btn px-4 py-2 text-xs font-semibold rounded-lg bg-indigo-600 text-white focus:outline-none transition-all" tabindex="0">전체보기</button>
                     <button role="tab" aria-selected="false" aria-controls="announcement-list" id="tab-qa" onclick="filterCategory('qa')" class="tab-btn px-4 py-2 text-xs font-semibold rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-750 transition-all" tabindex="-1"><span aria-hidden="true">🐛</span> QA</button>
                     <button role="tab" aria-selected="false" aria-controls="announcement-list" id="tab-monitoring" onclick="filterCategory('monitoring')" class="tab-btn px-4 py-2 text-xs font-semibold rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-750 transition-all" tabindex="-1"><span aria-hidden="true">📊</span> 모니터링</button>
-                    <button role="tab" aria-selected="false" aria-controls="announcement-list" id="tab-general" onclick="filterCategory('general')" class="tab-btn px-4 py-2 text-xs font-semibold rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-750 transition-all" tabindex="-1"><span aria-hidden="true">📢</span> 기타 업무</button>
+                    <button role="tab" aria-selected="false" aria-controls="announcement-list" id="tab-general" onclick="filterCategory('general')" class="tab-btn px-4 py-2 text-xs font-semibold rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-750 transition-all" tabindex="-1"><span aria-hidden="true">📢</span> 기타공지</button>
                 </div>
             </div>
         </section>
+
+        <!-- 🏷️ 선택된 태그 필터 상태 표시 영역 (a11y 준수) -->
+        <div id="active-tag-container" class="hidden items-center gap-2 mb-6 bg-indigo-500/10 border border-indigo-500/20 px-4 py-2 rounded-xl text-xs text-indigo-300 w-fit">
+            <span id="active-tag-text"></span>
+            <button onclick="clearTagFilter()" class="font-bold hover:text-white ml-1 p-1 rounded hover:bg-indigo-500/20" aria-label="태그 필터 해제">✕</button>
+        </div>
 
         <!-- Dynamic Screen Reader Announcements -->
         <div id="sr-announcement" class="sr-only" aria-live="polite" aria-atomic="true"></div>
@@ -87,13 +94,13 @@
         <section id="announcement-section" aria-labelledby="section-title">
             <h2 id="section-title" class="sr-only">공지사항 목록</h2>
             <div id="announcement-list" role="tabpanel" aria-labelledby="tab-all" class="space-y-4">
-                <!-- DB에서 가져온 데이터가 여기에 꽂힘 -->
+                <!-- DB 데이터 로드 공간 -->
             </div>
         </section>
 
     </main>
 
-    <!-- ♿ 새 공지 등록 모달창 -->
+    <!-- ♿ 새 공지 등록 모달창 (카테고리: QA, 모니터링, 기타공지) -->
     <dialog id="add-modal" class="bg-slate-900 border border-slate-800 text-slate-100 rounded-2xl p-6 max-w-lg w-full focus:outline-none" aria-labelledby="modal-title">
         <div class="flex justify-between items-center mb-6">
             <h2 id="modal-title" class="text-lg font-bold text-white flex items-center gap-2">
@@ -110,7 +117,7 @@
                 <select id="form-category" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     <option value="qa">🐛 QA</option>
                     <option value="monitoring">📊 모니터링</option>
-                    <option value="general">📢 기타 업무</option>
+                    <option value="general">📢 기타공지</option>
                 </select>
             </div>
 
@@ -137,7 +144,7 @@
     </dialog>
 
     <script>
-        // ⚠️여기에 내 Supabase 프로젝트 정보 입력
+        // 🔒 빌트인된 Supabase 인증 정보
         const SUPABASE_URL = "https://cqrvqcsupdgsxgtpfxtd.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxcnZxY3N1cGRnc3hndHBmeHRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQwNzk3MjcsImV4cCI6MjA5OTY1NTcyN30.NCUfjIvijawwy3v-wSaQXyzEioo_GK50QseGVpqXIqU";
 
@@ -145,6 +152,7 @@
         let announcements = [];
         let currentCategory = 'all';
         let searchQuery = '';
+        let selectedTag = ''; // 🏷️ 해시태그 필터링 상태 추가
         let triggerButton = null;
 
         window.onload = async () => {
@@ -158,17 +166,13 @@
             });
         };
 
-        // Supabase 초기화 및 연결 상태 감지
+        // Supabase 초기화 및 연결
         function initSupabase() {
             try {
-                if(SUPABASE_URL === "YOUR_SUPABASE_URL" || SUPABASE_ANON_KEY === "YOUR_SUPABASE_ANON_KEY") {
-                    updateStatus(false, "설정 대기 중 (API 키 필요)");
-                    return;
-                }
                 supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                 updateStatus(true, "Cloud Sync Active");
             } catch (err) {
-                updateStatus(false, "연결 실패");
+                updateStatus(false, "DB 연결 실패");
                 console.error(err);
             }
         }
@@ -184,7 +188,7 @@
             }
         }
 
-        // 🔄 데이터베이스에서 실시간 데이터 로드
+        // DB에서 데이터 가져오기
         async function loadData() {
             if(!supabaseClient) return;
             const { data, error } = await supabaseClient
@@ -193,8 +197,8 @@
                 .order('created_at', { ascending: false });
 
             if (error) {
-                console.error("데이터 읽기 에러:", error);
-                updateStatus(false, "데이터 로딩 오류");
+                console.error("데이터 로드 실패:", error);
+                updateStatus(false, "데이터 동기화 실패");
                 return;
             }
 
@@ -202,7 +206,38 @@
             renderList();
         }
 
-        // UI 렌더링
+        // 🏷️ 특정 해시태그 클릭 시 작동하는 필터링 함수
+        function filterByTag(tag) {
+            selectedTag = tag;
+            
+            // 태그 필터 바 노출 제어
+            const container = document.getElementById('active-tag-container');
+            const textSpan = document.getElementById('active-tag-text');
+            textSpan.textContent = `필터링된 태그: #${tag}`;
+            container.classList.remove('hidden');
+            container.classList.add('flex');
+
+            renderList();
+            
+            // 스크린 리더용 안내 발송
+            const srAnnouncement = document.getElementById('sr-announcement');
+            srAnnouncement.textContent = `태그 #${tag} 필터가 활성화되었습니다.`;
+        }
+
+        // 🏷️ 해시태그 필터 해제
+        function clearTagFilter() {
+            selectedTag = '';
+            const container = document.getElementById('active-tag-container');
+            container.classList.remove('flex');
+            container.classList.add('hidden');
+            
+            renderList();
+            
+            const srAnnouncement = document.getElementById('sr-announcement');
+            srAnnouncement.textContent = `태그 필터가 해제되어 전체 목록이 표시됩니다.`;
+        }
+
+        // 필터링 및 리스트 화면 렌더링
         function renderList() {
             const listContainer = document.getElementById('announcement-list');
             listContainer.innerHTML = '';
@@ -214,11 +249,19 @@
                     item.content.toLowerCase().includes(searchQuery) ||
                     (item.tags && item.tags.some(tag => tag.toLowerCase().includes(searchQuery)))
                 );
-                return matchesCategory && matchesSearch;
+                // 태그 필터 규칙 병합
+                const matchesTag = !selectedTag || (item.tags && item.tags.includes(selectedTag));
+
+                return matchesCategory && matchesSearch && matchesTag;
             });
 
+            // ARIA Live region 정보 갱신
             const srAnnouncement = document.getElementById('sr-announcement');
-            srAnnouncement.textContent = `현재 결과 총 ${filtered.length}개의 업무 공지가 필터링되었습니다.`;
+            const categoryNames = { all: "전체보기", qa: "QA", monitoring: "모니터링", general: "기타공지" };
+            let currentStatusMessage = `현재 ${categoryNames[currentCategory]} 카테고리`;
+            if(selectedTag) currentStatusMessage += `, #${selectedTag} 태그`;
+            currentStatusMessage += ` 필터링 결과 총 ${filtered.length}개의 업무 공지가 표기되어 있습니다.`;
+            srAnnouncement.textContent = currentStatusMessage;
 
             if (filtered.length === 0) {
                 listContainer.innerHTML = `
@@ -237,13 +280,17 @@
                 } else if(item.category === 'monitoring') {
                     catBadge = '<span class="bg-cyan-500/10 text-cyan-300 text-xs px-2.5 py-1 rounded-full font-semibold border border-cyan-500/20"><span aria-hidden="true">📊 </span>모니터링</span>';
                 } else {
-                    catBadge = '<span class="bg-amber-500/10 text-amber-300 text-xs px-2.5 py-1 rounded-full font-semibold border border-amber-500/20"><span aria-hidden="true">📢 </span>기타 업무</span>';
+                    catBadge = '<span class="bg-amber-500/10 text-amber-300 text-xs px-2.5 py-1 rounded-full font-semibold border border-amber-500/20"><span aria-hidden="true">📢 </span>기타공지</span>';
                 }
 
-                // Supabase에서 가져온 timezone 날짜 포맷팅 (YYYY-MM-DD)
                 const formattedDate = new Date(item.created_at || item.date).toISOString().split('T')[0];
 
-                const tagBadges = (item.tags || []).map(tag => `<span class="text-xs text-indigo-300 bg-indigo-500/5 border border-indigo-500/10 px-2 py-0.5 rounded-md">#${tag}</span>`).join(' ');
+                // ♿ 태그를 키보드 탭 및 인터랙션이 가능한 버튼으로 마크업 변경
+                const tagBadges = (item.tags || []).map(tag => `
+                    <button onclick="filterByTag('${tag}')" class="text-xs text-indigo-300 bg-indigo-500/5 hover:bg-indigo-500/20 border border-indigo-500/10 px-2 py-0.5 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-400" aria-label="태그 ${tag} 필터링 적용">
+                        #${tag}
+                    </button>
+                `).join(' ');
 
                 const cardHtml = `
                     <article class="bg-slate-800/40 border border-slate-800/80 rounded-2xl p-6 hover:border-slate-700 hover:bg-slate-800/60 focus-within:ring-2 focus-within:ring-indigo-500 transition-all duration-200" aria-labelledby="post-title-${item.id}">
@@ -256,8 +303,8 @@
                         </h3>
                         <p class="text-sm text-slate-300 leading-relaxed mb-4 whitespace-pre-line">${item.content}</p>
                         <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-800/85">
-                            <div class="flex flex-wrap gap-1.5">${tagBadges}</div>
-                            <button onclick="deleteAnnouncement(${item.id})" class="text-xs text-rose-400 hover:text-rose-300 hover:underline px-2.5 py-1 rounded">삭제하기</button>
+                            <div class="flex flex-wrap gap-1.5" aria-label="관련 태그">${tagBadges}</div>
+                            <button onclick="deleteAnnouncement(${item.id})" class="text-xs text-rose-400 hover:text-rose-300 hover:underline px-2.5 py-1 rounded" aria-label="'${item.title}' 공지사항 삭제">삭제하기</button>
                         </div>
                     </article>
                 `;
@@ -265,66 +312,7 @@
             });
         }
 
-        // 📝 DB에 새 공지 업로드
-        async function handleFormSubmit(e) {
-            e.preventDefault();
-            if(!supabaseClient) {
-                alert("Cloud DB와 연결이 설정되지 않았습니다.");
-                return;
-            }
-
-            const submitBtn = document.getElementById('submit-btn');
-            submitBtn.disabled = true;
-            submitBtn.textContent = "등록 중...";
-
-            const category = document.getElementById('form-category').value;
-            const title = document.getElementById('form-title').value.trim();
-            const content = document.getElementById('form-content').value.trim();
-            const rawTags = document.getElementById('form-tags').value;
-            const tags = rawTags ? rawTags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0) : [];
-
-            const { error } = await supabaseClient
-                .from('announcements')
-                .insert([{ category, title, content, tags }]);
-
-            submitBtn.disabled = false;
-            submitBtn.textContent = "공지 등록";
-
-            if (error) {
-                console.error("공지사항 추가 실패:", error);
-                alert("등록에 실패했습니다.");
-                return;
-            }
-
-            closeAddModal();
-            await loadData(); // 최신 DB 정보로 갱신
-
-            const srAnnouncement = document.getElementById('sr-announcement');
-            srAnnouncement.textContent = `신규 가이드 "${title}"이(가) 데이터베이스에 저장되었습니다.`;
-        }
-
-        // 🗑️ DB에서 공지 삭제
-        async function deleteAnnouncement(id) {
-            if(!supabaseClient) return;
-            if(confirm("이 공지사항을 클라우드 데이터베이스에서 완전히 삭제하시겠습니까?")) {
-                const { error } = await supabaseClient
-                    .from('announcements')
-                    .delete()
-                    .eq('id', id);
-
-                if (error) {
-                    console.error("삭제 실패:", error);
-                    alert("삭제 작업 수행 중 에러가 발생했습니다.");
-                    return;
-                }
-
-                await loadData();
-                const srAnnouncement = document.getElementById('sr-announcement');
-                srAnnouncement.textContent = `성공적으로 삭제되었습니다.`;
-            }
-        }
-
-        // 카테고리 탭 제어
+        // 카테고리 필터링
         function filterCategory(category) {
             currentCategory = category;
             const tabs = document.querySelectorAll('[role="tab"]');
@@ -345,7 +333,7 @@
             renderList();
         }
 
-        // 키보드 방향키 이동
+        // WAI-ARIA 탭 방향키 내비게이션
         function setupKeyboardNavigation() {
             const tabList = document.querySelector('[role="tablist"]');
             const tabs = document.querySelectorAll('[role="tab"]');
@@ -367,6 +355,7 @@
             });
         }
 
+        // 모달 제어
         function openAddModal() {
             triggerButton = document.activeElement;
             const modal = document.getElementById('add-modal');
@@ -380,6 +369,60 @@
             document.getElementById('add-form').reset();
             if (triggerButton) {
                 triggerButton.focus();
+            }
+        }
+
+        // DB에 신규 공지사항 인서트
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            if(!supabaseClient) {
+                alert("클라우드 서버 연결 오류로 글을 등록할 수 없습니다.");
+                return;
+            }
+
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = "등록 중...";
+
+            const category = document.getElementById('form-category').value;
+            const title = document.getElementById('form-title').value.trim();
+            const content = document.getElementById('form-content').value.trim();
+            const rawTags = document.getElementById('form-tags').value;
+            const tags = rawTags ? rawTags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0) : [];
+
+            const { error } = await supabaseClient
+                .from('announcements')
+                .insert([{ category, title, content, tags }]);
+
+            submitBtn.disabled = false;
+            submitBtn.textContent = "공지 등록";
+
+            if (error) {
+                console.error("인서트 중 에러 발생:", error);
+                alert("등록하는 동안 오류가 발생했습니다.");
+                return;
+            }
+
+            closeAddModal();
+            await loadData();
+        }
+
+        // DB에서 공지사항 삭제
+        async function deleteAnnouncement(id) {
+            if(!supabaseClient) return;
+            if(confirm("이 공지사항을 클라우드 데이터베이스에서 완전히 삭제하시겠습니까?")) {
+                const { error } = await supabaseClient
+                    .from('announcements')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) {
+                    console.error("삭제 실패:", error);
+                    alert("삭제 중 오류가 발생했습니다.");
+                    return;
+                }
+
+                await loadData();
             }
         }
     </script>
