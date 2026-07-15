@@ -3,63 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⚡ SV Dev Portal - 공지사항 보드</title>
+    <title>⚡ 접근성팀 공지 사항</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts (Inter) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
-        /* 스킵 네비게이션 스타일 */
         .skip-link:focus {
             transform: translateY(0%);
+        }
+        dialog::backdrop {
+            background-color: rgba(2, 6, 23, 0.85);
+            backdrop-filter: blur(4px);
         }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen">
 
-    <!-- 1. Skip Navigation (키보드 사용자용 스킵 링크) -->
+    <!-- 1. 키보드 사용자용 스킵 링크 -->
     <a href="#main-content" class="skip-link absolute top-0 left-0 bg-indigo-600 text-white px-4 py-2 rounded-b-lg z-[100] transform -translate-y-full transition-transform focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-white">
         본문 바로가기
     </a>
 
     <!-- Header Section -->
     <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
-        <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
-                <span aria-hidden="true" class="text-2xl">🚀</span>
+                <span aria-hidden="true" class="text-2xl">📋</span>
                 <div>
-                    <h1 class="text-xl font-bold tracking-tight text-white">SV Dev Portal</h1>
-                    <p class="text-xs text-slate-300">Engineering Sync & Announcements</p>
+                    <h1 class="text-xl font-bold tracking-tight text-white">Dev Meeting Notes</h1>
+                    <p class="text-xs text-slate-300">업무 진행 가이드 및 사내 공지사항 정리</p>
                 </div>
             </div>
-            <!-- 상태 배지 (스크린 리더 가독성 확보) -->
-            <div class="flex items-center gap-2 text-xs bg-slate-800 px-3 py-1.5 rounded-full text-slate-200" aria-label="현재 시스템 상태: 스프린트 버전 2.4 활성화 중">
-                <span class="w-2 h-2 rounded-full bg-emerald-500" aria-hidden="true"></span>
-                <span>Sprint v2.4 Active</span>
-            </div>
+            <!-- 백업 기능 유지 -->
+            <button onclick="exportData()" class="text-xs bg-slate-850 hover:bg-slate-800 text-slate-300 px-3 py-2 rounded-xl border border-slate-750 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500" aria-label="현재 등록된 공지사항 데이터를 JSON 파일로 내보내기">
+                📥 데이터 백업 (JSON)
+            </button>
         </div>
     </header>
 
-    <!-- Main Container -->
-    <main id="main-content" class="max-w-6xl mx-auto px-4 py-8" tabindex="-1">
+    <!-- Main Container (중앙 집중형 1칼럼 레이아웃) -->
+    <main id="main-content" class="max-w-4xl mx-auto px-4 py-8" tabindex="-1">
         
         <!-- Search & Filter Controls -->
-        <section class="bg-slate-800/50 border border-slate-800 rounded-2xl p-6 mb-8 backdrop-blur-sm" aria-label="검색 및 필터">
+        <section class="bg-slate-800/50 border border-slate-800 rounded-2xl p-6 mb-8 backdrop-blur-sm" aria-label="검색 및 카테고리 필터">
             <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
                 
-                <!-- Real-time Search Input -->
-                <div class="relative w-full md:w-96">
-                    <!-- 명시적인 Label 추가 (화면에서는 숨기고 스크린 리더에만 읽힘) -->
-                    <label id="search-label" for="search-input" class="sr-only">공지사항 제목, 내용, 태그 검색</label>
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400" aria-hidden="true">🔍</span>
-                    <input 
-                        type="search" 
-                        id="search-input"
-                        aria-labelledby="search-label"
-                        placeholder="제목, 내용, 태그 검색..." 
-                        class="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-sm text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                    />
+                <!-- Search Input & Add Button -->
+                <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto items-stretch sm:items-center">
+                    <div class="relative w-full sm:w-72">
+                        <label id="search-label" for="search-input" class="sr-only">공지사항 제목, 내용, 태그 검색</label>
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-450" aria-hidden="true">🔍</span>
+                        <input 
+                            type="search" 
+                            id="search-input"
+                            aria-labelledby="search-label"
+                            placeholder="제목, 내용, 태그 검색..." 
+                            class="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-sm text-slate-250 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                        />
+                    </div>
+                    <!-- 신규 공지 등록 버튼 -->
+                    <button onclick="openAddModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-400" aria-haspopup="dialog" aria-controls="add-modal">
+                        <span aria-hidden="true">➕</span> 공지 추가
+                    </button>
                 </div>
 
                 <!-- Category Tabs (WAI-ARIA Tab Pattern) -->
@@ -67,137 +74,207 @@
                     <button role="tab" aria-selected="true" aria-controls="announcement-list" id="tab-all" onclick="filterCategory('all')" class="tab-btn px-4 py-2 text-xs font-semibold rounded-lg bg-indigo-600 text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition-all" tabindex="0">전체보기</button>
                     <button role="tab" aria-selected="false" aria-controls="announcement-list" id="tab-qa" onclick="filterCategory('qa')" class="tab-btn px-4 py-2 text-xs font-semibold rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-750 hover:text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition-all" tabindex="-1"><span aria-hidden="true">🐛</span> QA</button>
                     <button role="tab" aria-selected="false" aria-controls="announcement-list" id="tab-monitoring" onclick="filterCategory('monitoring')" class="tab-btn px-4 py-2 text-xs font-semibold rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-750 hover:text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition-all" tabindex="-1"><span aria-hidden="true">📊</span> 모니터링</button>
-                    <button role="tab" aria-selected="false" aria-controls="announcement-list" id="tab-general" onclick="filterCategory('general')" class="tab-btn px-4 py-2 text-xs font-semibold rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-750 hover:text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition-all" tabindex="-1"><span aria-hidden="true">📢</span> 기타 공지</button>
+                    <button role="tab" aria-selected="false" aria-controls="announcement-list" id="tab-general" onclick="filterCategory('general')" class="tab-btn px-4 py-2 text-xs font-semibold rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-750 hover:text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition-all" tabindex="-1"><span aria-hidden="true">📢</span> 기타 업무</button>
                 </div>
             </div>
         </section>
 
-        <!-- Dynamic Screen Reader Announcements (스크린 리더 실시간 결과 피드백 전용) -->
+        <!-- Dynamic Screen Reader Announcements -->
         <div id="sr-announcement" class="sr-only" aria-live="polite" aria-atomic="true"></div>
 
-        <!-- Dashboard Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
-            <!-- Left: Announcement List (Role: Tabpanel) -->
-            <section class="lg:col-span-2 space-y-4" id="announcement-section" aria-labelledby="section-title">
-                <h2 id="section-title" class="sr-only">공지사항 목록</h2>
-                <div id="announcement-list" role="tabpanel" aria-labelledby="tab-all" class="space-y-4">
-                    <!-- Dynamically populated via JS -->
-                </div>
-            </section>
+        <!-- Announcement List -->
+        <section id="announcement-section" aria-labelledby="section-title">
+            <h2 id="section-title" class="sr-only">공지사항 목록</h2>
+            <div id="announcement-list" role="tabpanel" aria-labelledby="tab-all" class="space-y-4">
+                <!-- Dynamically populated via JS -->
+            </div>
+        </section>
 
-            <!-- Right: Quick Status & Metrics -->
-            <aside class="space-y-6" aria-label="부가 정보 및 시스템 현황">
-                <!-- Status Card -->
-                <div class="bg-slate-800/30 border border-slate-800 rounded-2xl p-6">
-                    <h2 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-4">📢 시스템 상태 요약</h2>
-                    <div class="space-y-3 text-sm">
-                        <div class="flex justify-between items-center py-2 border-b border-slate-850">
-                            <span class="text-slate-300">스테이징 빌드</span>
-                            <span class="px-2 py-0.5 rounded text-xs bg-emerald-500/10 text-emerald-400 font-semibold border border-emerald-500/20">Passing</span>
-                        </div>
-                        <div class="flex justify-between items-center py-2 border-b border-slate-850">
-                            <span class="text-slate-300">Datadog 연동</span>
-                            <span class="px-2 py-0.5 rounded text-xs bg-emerald-500/10 text-emerald-400 font-semibold border border-emerald-500/20">Connected</span>
-                        </div>
-                        <div class="flex justify-between items-center py-2">
-                            <span class="text-slate-300">Code Freeze D-Day</span>
-                            <span class="px-2 py-0.5 rounded text-xs bg-amber-500/10 text-amber-400 font-semibold border border-amber-500/20">D-6 (7월 21일)</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- On-Call Card -->
-                <div class="bg-slate-800/30 border border-slate-800 rounded-2xl p-6">
-                    <h2 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-3">📞 이번 주 온콜 엔지니어</h2>
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center font-bold text-white text-sm" aria-hidden="true">
-                            JD
-                        </div>
-                        <div>
-                            <p class="text-sm font-semibold text-slate-200">John Doe (Infra Team)</p>
-                            <p class="text-xs text-slate-300">Slack: <span aria-label="골뱅이 john 언더바 infra">@john_infra</span></p>
-                        </div>
-                    </div>
-                </div>
-            </aside>
-
-        </div>
     </main>
+
+    <!-- ♿ 새 공지 등록 모달창 (작성자 필드 제외) -->
+    <dialog id="add-modal" class="bg-slate-900 border border-slate-800 text-slate-100 rounded-2xl p-6 max-w-lg w-full focus:outline-none" aria-labelledby="modal-title">
+        <div class="flex justify-between items-center mb-6">
+            <h2 id="modal-title" class="text-lg font-bold text-white flex items-center gap-2">
+                <span aria-hidden="true">📝</span> 신규 업무 공지 추가
+            </h2>
+            <button onclick="closeAddModal()" class="text-slate-400 hover:text-white text-sm p-1.5 rounded-lg hover:bg-slate-800" aria-label="공지사항 작성 창 닫기">
+                ✕
+            </button>
+        </div>
+        
+        <form id="add-form" class="space-y-4" onsubmit="handleFormSubmit(event)">
+            <!-- 분류 및 우선순위 -->
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label for="form-category" class="block text-xs font-semibold text-slate-300 mb-1.5">카테고리 분류 *</label>
+                    <select id="form-category" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="qa">🐛 QA</option>
+                        <option value="monitoring">📊 모니터링</option>
+                        <option value="general">📢 기타 업무</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="form-priority" class="block text-xs font-semibold text-slate-300 mb-1.5">우선순위 *</label>
+                    <select id="form-priority" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="High">🔥 High</option>
+                        <option value="Medium">⚡ Medium</option>
+                        <option value="Low">💤 Low</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 제목 -->
+            <div>
+                <label for="form-title" class="block text-xs font-semibold text-slate-300 mb-1.5">공지 제목 *</label>
+                <input type="text" id="form-title" required placeholder="예: 스테이징 환경 QA 프리징 시나리오 안내" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+
+            <!-- 태그 -->
+            <div>
+                <label for="form-tags" class="block text-xs font-semibold text-slate-300 mb-1.5">태그 (쉼표로 구분)</label>
+                <input type="text" id="form-tags" placeholder="QA, 배포가이드, Datadog" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+
+            <!-- 본문 내용 -->
+            <div>
+                <label for="form-content" class="block text-xs font-semibold text-slate-300 mb-1.5">공지 상세 내용 *</label>
+                <textarea id="form-content" required rows="5" placeholder="회의 도중 공유된 구체적인 실행 절차나 업무 준수 사항을 작성하세요." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+            </div>
+
+            <!-- 하단 제어 영역 -->
+            <div class="flex justify-end gap-2 pt-4 border-t border-slate-800">
+                <button type="button" onclick="closeAddModal()" class="px-4 py-2 text-sm font-semibold bg-slate-800 hover:bg-slate-755 text-slate-300 rounded-xl transition-all">취소</button>
+                <button type="submit" class="px-4 py-2 text-sm font-semibold bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl transition-all">공지 등록</button>
+            </div>
+        </form>
+    </dialog>
 
     <!-- JS Core Logic -->
     <script>
-        const announcements = [
+        // 실제 업무용 샘플 데이터 구성
+        const defaultAnnouncements = [
             {
                 id: 1,
                 category: "qa",
                 priority: "High",
-                title: "v2.4 릴리스 후보(RC) 전체 Regression Test 진행",
-                content: "결제 모듈 개편에 따른 스테이징 환경 전체 QA가 시작되었습니다. Edge case에서 트랜잭션 실패 시 롤백 로직이 정상 동작하는지 집중 검증해 주세요. 크리티컬 버그 발견 시 Jira [PROD-4021] 티켓 하위에 서브 태스크로 생성 부탁드립니다.",
-                tags: ["QA", "v2.4", "Payment", "Staging"],
-                date: "2026-07-15",
-                author: "Sarah (QA Lead)"
+                title: "스테이징 환경 배포 전 필수 QA 시나리오 적용 의무화",
+                content: "앞으로 모든 신규 마이크로서비스 기능은 스테이징 환경 배포 전, 정의된 'Smoke Test 시나리오'를 통과해야 최종 배포 승인이 납니다. QA 프로세스 누락 시 배포가 불가능하오니 절차를 반드시 준수해 주세요.",
+                tags: ["QA", "배포프로세스", "Smoke-Test"],
+                date: "2026-07-15"
             },
             {
                 id: 2,
                 category: "monitoring",
                 priority: "Medium",
-                title: "Datadog Alert 임계치 최적화 작업 예정",
-                content: "기존에 Kubernetes Pod CPU 사용량이 일시적으로 80%를 칠 때마다 슬랙 알람이 울려 피로도가 높았습니다. 이를 방지하고자 '85% 이상 상태가 5분 이상 지속될 때'만 온콜로 넘어가도록 임계치를 상향 조정했습니다.",
-                tags: ["Datadog", "K8s", "On-call", "Infra"],
-                date: "2026-07-14",
-                author: "Alex (Infra Dev)"
+                title: "서비스 장애 인지 시간 단축을 위한 Alert 연동 프로세스 개선",
+                content: "모니터링 얼럿 수신 시, 확인 여부를 슬랙 스레드로 즉각 공유해 주시기 바랍니다. 얼럿 발생 후 10분 이내 무반응 시 온콜 에스컬레이션이 자동으로 발동되도록 설정이 변경되었습니다.",
+                tags: ["모니터링", "Datadog", "Slack"],
+                date: "2026-07-14"
             },
             {
                 id: 3,
                 category: "general",
                 priority: "High",
-                title: "다음 주 화요일(7/21) 18:00 Code Freeze 및 배포 준비",
-                content: "v2.4 정식 프로덕션 배포를 위해 다음 주 화요일 18:00부로 Code Freeze가 들어갑니다. 긴급 핫픽스를 제외한 모든 PR은 사전에 머지하거나 배포 이후로 일정을 조율해 주시기 바랍니다.",
-                tags: ["Deployment", "Code-Freeze", "Schedule"],
-                date: "2026-07-15",
-                author: "Chris (Engineering Manager)"
-            },
-            {
-                id: 4,
-                category: "qa",
-                priority: "Low",
-                title: "신규 개발 피처 테스트 커버리지 가이드라인 업데이트",
-                content: "앞으로 작성되는 모든 신규 비즈니스 로직은 유닛 테스트 커버리지 최소 80% 이상을 만족해야 빌드가 통과되도록 CI/CD 파이프라인 설정을 수정할 예정입니다. 변경 가이드를 미리 체크해 주세요.",
-                tags: ["QA", "CI/CD", "Test-Coverage"],
-                date: "2026-07-12",
-                author: "Sarah (QA Lead)"
-            },
-            {
-                id: 5,
-                category: "monitoring",
-                priority: "Medium",
-                title: "마이크로서비스 APM Latency Matrix 대시보드 신설",
-                content: "서비스 간 동기/비동기 호출 병목 지점을 시각화해 주는 신규 APM 대시보드가 Datadog에 구축되었습니다. 트러블슈팅 발생 시 디버깅용으로 적극 활용 바랍니다. (대시보드 링크는 사내 위키 참고)",
-                tags: ["Datadog", "APM", "Microservices"],
-                date: "2026-07-11",
-                author: "Alex (Infra Dev)"
+                title: "외부 라이브러리 도입 시 보안 검토 프로세스 신설",
+                content: "사내 프로젝트에 새로운 오픈소스나 패키지를 임포트할 경우, 사전에 보안팀 승인 및 라이선스 체크(OSS License Compliance)가 강제됩니다. 라이선스 침해 이슈 예방을 위함이니 적극 협조 바랍니다.",
+                tags: ["회사규정", "보안", "오픈소스"],
+                date: "2026-07-13"
             }
         ];
 
+        let announcements = JSON.parse(localStorage.getItem('sv-dev-announcements')) || defaultAnnouncements;
         let currentCategory = 'all';
         let searchQuery = '';
+        let triggerButton = null;
 
         window.onload = () => {
             renderList();
             setupKeyboardNavigation();
             
-            // 실시간 검색 검색어 입력 이벤트 (디바운싱 생략, 즉각 반응)
             document.getElementById('search-input').addEventListener('input', (e) => {
                 searchQuery = e.target.value.toLowerCase();
                 renderList();
             });
         };
 
-        // 카테고리 필터 변경 (WAI-ARIA 상태 관리 포함)
+        // UI 렌더링
+        function renderList() {
+            const listContainer = document.getElementById('announcement-list');
+            listContainer.innerHTML = '';
+
+            const filtered = announcements.filter(item => {
+                const matchesCategory = (currentCategory === 'all' || item.category === currentCategory);
+                const matchesSearch = (
+                    item.title.toLowerCase().includes(searchQuery) ||
+                    item.content.toLowerCase().includes(searchQuery) ||
+                    (item.tags && item.tags.some(tag => tag.toLowerCase().includes(searchQuery)))
+                );
+                return matchesCategory && matchesSearch;
+            });
+
+            // 스크린 리더 음성 피드백 영역
+            const srAnnouncement = document.getElementById('sr-announcement');
+            const categoryNames = { all: "전체보기", qa: "QA 업무", monitoring: "모니터링 업무", general: "기타 사내 업무" };
+            srAnnouncement.textContent = `현재 ${categoryNames[currentCategory]} 카테고리, 검색 결과 총 ${filtered.length}개의 업무 공지가 필터링되었습니다.`;
+
+            if (filtered.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="text-center py-16 bg-slate-800/20 border border-dashed border-slate-800 rounded-2xl" role="status">
+                        <span class="text-4xl" aria-hidden="true">🤔</span>
+                        <p class="text-slate-300 mt-3 text-sm">일치하는 업무 공지사항이 없습니다.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.forEach(item => {
+                let catBadge = '';
+                if(item.category === 'qa') {
+                    catBadge = '<span class="bg-rose-500/10 text-rose-300 text-xs px-2.5 py-1 rounded-full font-semibold border border-rose-500/20"><span aria-hidden="true">🐛 </span>QA</span>';
+                } else if(item.category === 'monitoring') {
+                    catBadge = '<span class="bg-cyan-500/10 text-cyan-300 text-xs px-2.5 py-1 rounded-full font-semibold border border-cyan-500/20"><span aria-hidden="true">📊 </span>모니터링</span>';
+                } else {
+                    catBadge = '<span class="bg-amber-500/10 text-amber-300 text-xs px-2.5 py-1 rounded-full font-semibold border border-amber-500/20"><span aria-hidden="true">📢 </span>기타 업무</span>';
+                }
+
+                let priorityBadge = '';
+                if (item.priority === 'High') {
+                    priorityBadge = `<span class="text-[10px] bg-red-500/20 text-red-200 px-1.5 py-0.5 rounded font-bold uppercase tracking-wide" aria-label="우선순위 높음">High</span>`;
+                } else if (item.priority === 'Medium') {
+                    priorityBadge = `<span class="text-[10px] bg-amber-500/20 text-amber-200 px-1.5 py-0.5 rounded font-bold uppercase tracking-wide" aria-label="우선순위 보통">Medium</span>`;
+                } else {
+                    priorityBadge = `<span class="text-[10px] bg-slate-700 text-slate-200 px-1.5 py-0.5 rounded font-bold uppercase tracking-wide" aria-label="우선순위 낮음">Low</span>`;
+                }
+
+                const tagBadges = (item.tags || []).map(tag => `<span class="text-xs text-indigo-300 bg-indigo-500/5 border border-indigo-500/10 px-2 py-0.5 rounded-md" aria-label="태그: ${tag}">#${tag}</span>`).join(' ');
+
+                const cardHtml = `
+                    <article class="bg-slate-800/40 border border-slate-800/80 rounded-2xl p-6 hover:border-slate-700 hover:bg-slate-800/60 focus-within:ring-2 focus-within:ring-indigo-500 transition-all duration-200" aria-labelledby="post-title-${item.id}">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                            <div class="flex items-center gap-2">
+                                ${catBadge}
+                                ${priorityBadge}
+                            </div>
+                            <time class="text-xs text-slate-300" datetime="${item.date}">${item.date}</time>
+                        </div>
+                        <h3 id="post-title-${item.id}" class="text-lg font-semibold text-white mb-2">
+                            <a href="#" class="hover:text-indigo-400 focus:outline-none focus:underline transition-colors">${item.title}</a>
+                        </h3>
+                        <p class="text-sm text-slate-300 leading-relaxed mb-4 whitespace-pre-line">${item.content}</p>
+                        <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-800/85">
+                            <div class="flex flex-wrap gap-1.5" aria-label="관련 태그">${tagBadges}</div>
+                            <button onclick="deleteAnnouncement(${item.id})" class="text-xs text-rose-400 hover:text-rose-300 hover:underline px-2.5 py-1 rounded" aria-label="'${item.title}' 공지사항 삭제">삭제하기</button>
+                        </div>
+                    </article>
+                `;
+                listContainer.insertAdjacentHTML('beforeend', cardHtml);
+            });
+        }
+
+        // 카테고리 필터링 제어
         function filterCategory(category) {
             currentCategory = category;
-            
             const tabs = document.querySelectorAll('[role="tab"]');
             tabs.forEach(tab => {
                 const isSelected = tab.id === `tab-${category}`;
@@ -213,15 +290,13 @@
                     tab.classList.add('bg-slate-800', 'text-slate-300');
                 }
             });
-
             renderList();
         }
 
-        // 키보드 방향키로 탭 탐색 가능하도록 구현 (WAI-ARIA Tab list 키보드 내비게이션 표준 준수)
+        // 탭 키보드 내비게이션
         function setupKeyboardNavigation() {
             const tabList = document.querySelector('[role="tablist"]');
             const tabs = document.querySelectorAll('[role="tab"]');
-
             tabList.addEventListener('keydown', (e) => {
                 let currentFocus = Array.from(tabs).indexOf(document.activeElement);
                 if (currentFocus === -1) return;
@@ -240,80 +315,77 @@
             });
         }
 
-        // 렌더링 및 스크린 리더 실시간 피드백
-        function renderList() {
-            const listContainer = document.getElementById('announcement-list');
-            listContainer.innerHTML = '';
+        // 모달 열기/닫기
+        function openAddModal() {
+            triggerButton = document.activeElement;
+            const modal = document.getElementById('add-modal');
+            modal.showModal();
+            document.getElementById('form-category').focus();
+        }
 
-            const filtered = announcements.filter(item => {
-                const matchesCategory = (currentCategory === 'all' || item.category === currentCategory);
-                const matchesSearch = (
-                    item.title.toLowerCase().includes(searchQuery) ||
-                    item.content.toLowerCase().includes(searchQuery) ||
-                    item.tags.some(tag => tag.toLowerCase().includes(searchQuery))
-                );
-                return matchesCategory && matchesSearch;
-            });
-
-            // ARIA Live region 업데이트 (스크린 리더 사용자에게 실시간 검색 결과 수 알림)
-            const srAnnouncement = document.getElementById('sr-announcement');
-            const categoryNames = { all: "전체보기", qa: "QA", monitoring: "모니터링", general: "기타 공지" };
-            srAnnouncement.textContent = `현재 ${categoryNames[currentCategory]} 카테고리, 검색 결과 총 ${filtered.length}개의 항목이 로드되었습니다.`;
-
-            if (filtered.length === 0) {
-                listContainer.innerHTML = `
-                    <div class="text-center py-16 bg-slate-800/20 border border-dashed border-slate-800 rounded-2xl" role="status">
-                        <span class="text-4xl" aria-hidden="true">🤔</span>
-                        <p class="text-slate-300 mt-3 text-sm">일치하는 공지사항이 없습니다.</p>
-                    </div>
-                `;
-                return;
+        function closeAddModal() {
+            const modal = document.getElementById('add-modal');
+            modal.close();
+            document.getElementById('add-form').reset();
+            if (triggerButton) {
+                triggerButton.focus();
             }
+        }
 
-            filtered.forEach(item => {
-                // 카테고리 뱃지 마크업 (의미 없는 이모지는 aria-hidden 처리)
-                let catBadge = '';
-                if(item.category === 'qa') {
-                    catBadge = '<span class="bg-rose-500/10 text-rose-300 text-xs px-2.5 py-1 rounded-full font-semibold border border-rose-500/20"><span aria-hidden="true">🐛 </span>QA</span>';
-                } else if(item.category === 'monitoring') {
-                    catBadge = '<span class="bg-cyan-500/10 text-cyan-300 text-xs px-2.5 py-1 rounded-full font-semibold border border-cyan-500/20"><span aria-hidden="true">📊 </span>모니터링</span>';
-                } else {
-                    catBadge = '<span class="bg-amber-500/10 text-amber-300 text-xs px-2.5 py-1 rounded-full font-semibold border border-amber-500/20"><span aria-hidden="true">📢 </span>기타 공지</span>';
-                }
+        // 새 데이터 등록
+        function handleFormSubmit(e) {
+            e.preventDefault();
 
-                // 우선순위 뱃지 마크업 및 의미 명확화
-                let priorityBadge = '';
-                if (item.priority === 'High') {
-                    priorityBadge = `<span class="text-[10px] bg-red-500/20 text-red-200 px-1.5 py-0.5 rounded font-bold uppercase tracking-wide" aria-label="우선순위: 높음">High</span>`;
-                } else if (item.priority === 'Medium') {
-                    priorityBadge = `<span class="text-[10px] bg-amber-500/20 text-amber-200 px-1.5 py-0.5 rounded font-bold uppercase tracking-wide" aria-label="우선순위: 보통">Medium</span>`;
-                } else {
-                    priorityBadge = `<span class="text-[10px] bg-slate-700 text-slate-200 px-1.5 py-0.5 rounded font-bold uppercase tracking-wide" aria-label="우선순위: 낮음">Low</span>`;
-                }
+            const category = document.getElementById('form-category').value;
+            const title = document.getElementById('form-title').value.trim();
+            const priority = document.getElementById('form-priority').value;
+            const content = document.getElementById('form-content').value.trim();
+            
+            const rawTags = document.getElementById('form-tags').value;
+            const tags = rawTags ? rawTags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0) : [];
+            const today = new Date().toISOString().split('T')[0];
 
-                const tagBadges = item.tags.map(tag => `<span class="text-xs text-indigo-300 bg-indigo-500/5 border border-indigo-500/10 px-2 py-0.5 rounded-md" aria-label="태그 ${tag}">#${tag}</span>`).join(' ');
+            const newAnnouncement = {
+                id: Date.now(),
+                category,
+                priority,
+                title,
+                content,
+                tags,
+                date: today
+            };
 
-                const cardHtml = `
-                    <article class="bg-slate-800/40 border border-slate-800/80 rounded-2xl p-6 hover:border-slate-700 hover:bg-slate-800/60 focus-within:ring-2 focus-within:ring-indigo-500 transition-all duration-200" aria-labelledby="post-title-${item.id}">
-                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-                            <div class="flex items-center gap-2">
-                                ${catBadge}
-                                ${priorityBadge}
-                            </div>
-                            <time class="text-xs text-slate-300" datetime="${item.date}">${item.date}</time>
-                        </div>
-                        <h3 id="post-title-${item.id}" class="text-lg font-semibold text-white mb-2">
-                            <a href="#" class="hover:text-indigo-400 focus:outline-none focus:underline transition-colors">${item.title}</a>
-                        </h3>
-                        <p class="text-sm text-slate-300 leading-relaxed mb-4 whitespace-pre-line">${item.content}</p>
-                        <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-800/80">
-                            <div class="flex flex-wrap gap-1.5" aria-label="관련 태그">${tagBadges}</div>
-                            <span class="text-xs text-slate-300 font-medium">작성자: ${item.author}</span>
-                        </div>
-                    </article>
-                `;
-                listContainer.insertAdjacentHTML('beforeend', cardHtml);
-            });
+            announcements.unshift(newAnnouncement);
+            localStorage.setItem('sv-dev-announcements', JSON.stringify(announcements));
+
+            renderList();
+            closeAddModal();
+
+            const srAnnouncement = document.getElementById('sr-announcement');
+            srAnnouncement.textContent = `신규 가이드 "${title}"이(가) 정상 등록되었습니다.`;
+        }
+
+        // 삭제 처리
+        function deleteAnnouncement(id) {
+            if(confirm("이 공지사항을 삭제하시겠습니까?")) {
+                announcements = announcements.filter(item => item.id !== id);
+                localStorage.setItem('sv-dev-announcements', JSON.stringify(announcements));
+                renderList();
+
+                const srAnnouncement = document.getElementById('sr-announcement');
+                srAnnouncement.textContent = `해당 공지사항이 삭제되었습니다.`;
+            }
+        }
+
+        // 백업 추출
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(announcements, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "meeting_announcements.json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
         }
     </script>
 </body>
