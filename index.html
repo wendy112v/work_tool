@@ -7,116 +7,50 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        // 🌓 Tailwind 다크모드 설정을 class 기반으로 활성화
-        tailwind.config = {
-            darkMode: 'class'
-        }
+        tailwind.config = { darkMode: 'class' }
     </script>
     <!-- Google Fonts (Inter) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- 🔌 Supabase JS Client CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- ✍️ Quill Rich Text Editor CDN (Snow Theme) -->
+    <!-- ✍️ Quill Rich Text Editor CDN -->
     <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
 
     <style>
         body { font-family: 'Inter', sans-serif; }
-        .skip-link:focus {
-            transform: translateY(0%);
-        }
-        dialog::backdrop {
-            background-color: rgba(2, 6, 23, 0.85);
-            backdrop-filter: blur(4px);
-        }
-
-        /* 🎨 Quill 에디터 표준 라이트모드 스타일 */
-        .ql-toolbar.ql-snow {
-            border-color: #cbd5e1 !important; /* slate-300 */
-            background-color: #f8fafc !important; /* slate-50 */
-            border-top-left-radius: 0.75rem;
-            border-top-right-radius: 0.75rem;
-        }
-        .ql-container.ql-snow {
-            border-color: #cbd5e1 !important;
-            background-color: #ffffff !important;
-            border-bottom-left-radius: 0.75rem;
-            border-bottom-right-radius: 0.75rem;
-            font-family: 'Inter', sans-serif;
-            color: #0f172a !important; /* slate-900 */
-        }
-        .ql-editor {
-            min-height: 250px;
-            font-size: 0.875rem;
-        }
-
-        /* 🌙 Quill 에디터 다크모드 테마 스위칭 (.dark 클래스 스코핑) */
-        .dark .ql-toolbar.ql-snow {
-            border-color: #334155 !important; /* slate-700 */
-            background-color: #0f172a !important; /* slate-900 */
-        }
-        .dark .ql-container.ql-snow {
-            border-color: #334155 !important;
-            background-color: #020617 !important; /* slate-950 */
-            color: #e2e8f0 !important; /* slate-200 */
-        }
-        .dark .ql-editor {
-            color: #e2e8f0 !important;
-        }
-        .dark .ql-snow .ql-stroke { stroke: #cbd5e1 !important; }
-        .dark .ql-snow .ql-fill { fill: #cbd5e1 !important; }
-        .dark .ql-snow .ql-picker { color: #cbd5e1 !important; }
-        .dark .ql-snow .ql-picker-options { background-color: #0f172a !important; border-color: #334155 !important; }
-        .dark .ql-snow .ql-picker-item { color: #cbd5e1 !important; }
-        .dark .ql-snow.ql-toolbar button:hover .ql-stroke,
-        .dark .ql-snow .ql-toolbar button:hover .ql-stroke,
-        .dark .ql-snow.ql-toolbar button.ql-active .ql-stroke,
-        .dark .ql-snow .ql-toolbar button.ql-active .ql-stroke {
-            stroke: #818cf8 !important; /* indigo-400 */
-        }
-
+        .skip-link:focus { transform: translateY(0%); }
+        dialog::backdrop { background-color: rgba(2, 6, 23, 0.85); backdrop-filter: blur(4px); }
+        
         /* 📋 위키 콘텐츠 카드 내부 렌더링 가독성 및 명암비 규격화 (라이트/다크 통합 대응) */
         .rich-content h1 { font-size: 1.5rem !important; font-weight: 700 !important; margin-top: 1.25rem !important; margin-bottom: 0.5rem !important; }
         .rich-content h2 { font-size: 1.25rem !important; font-weight: 600 !important; margin-top: 1rem !important; margin-bottom: 0.5rem !important; }
         .rich-content h3 { font-size: 1.125rem !important; font-weight: 650 !important; margin-top: 0.875rem !important; margin-bottom: 0.5rem !important; }
-        .rich-content ul { list-style-type: disc !important; margin-left: 1.5rem !important; margin-top: 0.5rem !important; margin-bottom: 0.5rem !important; }
-        .rich-content ol { list-style-type: decimal !important; margin-left: 1.5rem !important; margin-top: 0.5rem !important; margin-bottom: 0.5rem !important; }
+        
+        /* 리스트 레이아웃 표준화 */
+        .rich-content ul, .rich-content ol { padding-left: 1.5rem !important; margin-top: 0.5rem !important; margin-bottom: 0.5rem !important; }
+        .rich-content ul { list-style-type: disc !important; }
+        .rich-content ol { list-style-type: decimal !important; }
+        
+        /* [Bug Fix] Quill 에디터 자체 리스트 특성 완벽 제어 */
+        .rich-content li[data-list="bullet"] { list-style-type: disc !important; }
+        .rich-content li[data-list="ordered"] { list-style-type: decimal !important; }
+        
         .rich-content li { margin-bottom: 0.25rem !important; }
         .rich-content strong { font-weight: 700 !important; }
         .rich-content em { font-style: italic !important; }
         .rich-content p { margin-bottom: 0.5rem !important; }
-        
-        /* 하이퍼링크 테마 스위칭 */
         .rich-content a { color: #4f46e5 !important; text-decoration: underline !important; }
         .dark .rich-content a { color: #818cf8 !important; }
-        
-        /* 인용구(Blockquote) 테마 스위칭 */
-        .rich-content blockquote {
-            border-left: 4px solid #4f46e5 !important; padding-left: 1rem !important; margin: 0.75rem 0 !important;
-            color: #475569 !important; font-style: italic !important; background-color: rgba(79, 70, 229, 0.03);
-            padding-top: 0.25rem; padding-bottom: 0.25rem; border-radius: 0 0.375rem 0.375rem 0;
-        }
-        .dark .rich-content blockquote {
-            border-left: 4px solid #6366f1 !important; color: #94a3b8 !important;
-            background-color: rgba(99, 102, 241, 0.05);
-        }
-
-        /* 코드 블록(Pre) 테마 스위칭 */
-        .rich-content pre {
-            background-color: #f8fafc !important; border: 1px solid #cbd5e1 !important;
-            padding: 0.75rem !important; border-radius: 0.5rem !important; font-family: monospace !important;
-            margin: 0.75rem 0 !important; overflow-x: auto !important; color: #334155 !important;
-        }
+        .rich-content blockquote { border-left: 4px solid #4f46e5 !important; padding-left: 1rem !important; margin: 0.75rem 0 !important; color: #475569 !important; font-style: italic !important; background-color: rgba(79, 70, 229, 0.03); padding-top: 0.25rem; padding-bottom: 0.25rem; border-radius: 0 0.375rem 0.375rem 0; }
+        .dark .rich-content blockquote { border-left: 4px solid #6366f1 !important; color: #94a3b8 !important; background-color: rgba(99, 102, 241, 0.05); }
+        .rich-content pre { background-color: #f8fafc !important; border: 1px solid #cbd5e1 !important; padding: 0.75rem !important; border-radius: 0.5rem !important; font-family: monospace !important; margin: 0.75rem 0 !important; overflow-x: auto !important; color: #334155 !important; }
         .dark .rich-content pre { background-color: #020617 !important; border: 1px solid #334155 !important; color: #cbd5e1 !important; }
-
-        /* 인라인 코드 테마 스위칭 */
         .rich-content code { background-color: #f1f5f9 !important; padding: 0.2rem 0.4rem !important; border-radius: 0.25rem !important; font-family: monospace !important; color: #dc2626 !important; }
         .dark .rich-content code { background-color: #0f172a !important; color: #f43f5e !important; }
-
-        /* 이미지 삽입 */
         .rich-content img { max-width: 100% !important; height: auto !important; border-radius: 0.5rem !important; margin: 0.75rem 0 !important; }
-
-        /* 위키 표(Table) 대응 테마별 복붙 최적화 정밀 CSS */
+        
+        /* 표(Table) 대응 테마별 정밀 CSS */
         .rich-content table { border-collapse: collapse !important; width: 100% !important; margin: 1.25rem 0 !important; font-size: 0.875rem !important; border-radius: 0.5rem !important; overflow: hidden !important; border: 1px solid #cbd5e1 !important; }
         .dark .rich-content table { border: 1px solid #334155 !important; }
         .rich-content th, .rich-content td { border: 1px solid #cbd5e1 !important; padding: 0.625rem 0.875rem !important; text-align: left !important; }
@@ -125,113 +59,112 @@
         .dark .rich-content th { background-color: #0f172a !important; color: #ffffff !important; }
         .rich-content tr:nth-child(even) { background-color: rgba(0, 0, 0, 0.01) !important; }
         .dark .rich-content tr:nth-child(even) { background-color: rgba(255, 255, 255, 0.02) !important; }
-
-        /* 체크박스 대응 */
         .rich-content input[type="checkbox"] { margin-right: 0.5rem !important; accent-color: #4f46e5 !important; pointer-events: none !important; transform: scale(1.1) !important; vertical-align: middle !important; }
         .dark .rich-content input[type="checkbox"] { accent-color: #6366f1 !important; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100 min-h-screen transition-colors duration-200">
 
-    <!-- 1. 키보드 사용자용 스킵 링크 -->
-    <a href="#main-content" class="skip-link absolute top-0 left-0 bg-indigo-600 text-white px-4 py-2 rounded-b-lg z-[100] transform -translate-y-full transition-transform focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-white">
-        본문 바로가기
-    </a>
+    <!-- 로그인 전 화면 -->
+    <div id="auth-view" class="flex items-center justify-center min-h-screen px-4 bg-slate-100 dark:bg-slate-950">
+        <div class="max-w-md w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 rounded-2xl shadow-xl text-center">
+            <span class="text-4xl" aria-hidden="true">🔒</span>
+            <h2 class="text-xl font-bold mt-4 text-slate-900 dark:text-white">접근성팀 포탈 인증</h2>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 mb-6">현재 브라우저에 로그인된 사내 구글 계정으로 접속하세요.</p>
+            
+            <!-- 🚨 [새로 추가된 영역] 도메인 거부 시 나타나는 에러 메시지 알림창 (a11y role="alert" 부여) -->
+            <div id="auth-error-box" class="hidden items-start gap-2 text-left bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 p-4 rounded-xl text-xs mb-6" role="alert">
+                <span aria-hidden="true" class="text-base">⚠️</span>
+                <div class="flex-1">
+                    <p class="font-bold mb-0.5">인증 거부됨</p>
+                    <p id="auth-error-msg">허용되지 않은 계정입니다.</p>
+                </div>
+            </div>
 
-    <!-- Header Section -->
-    <header class="border-b border-slate-200 bg-white/85 dark:border-slate-800 dark:bg-slate-900/80 backdrop-blur sticky top-0 z-50 transition-colors duration-200">
-        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <span aria-hidden="true" class="text-2xl">📋</span>
-                <div>
+            <!-- 구글 SSO 버튼 -->
+            <button onclick="handleGoogleLogin()" id="login-btn" class="w-full flex items-center justify-center gap-3 bg-white border border-slate-300 dark:border-transparent dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-750 font-semibold p-3 rounded-xl text-sm transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-700 dark:text-slate-200 shadow-sm">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="#EA4335" d="M12.24 10.285V14.4h6.887c-.648 2.41-2.519 4.114-5.137 4.114-3.465 0-6.284-2.813-6.284-6.279s2.819-6.28 6.284-6.28c1.55 0 2.984.568 4.122 1.503l3.056-3.051C19.121 2.14 15.86 1 12.24 1 5.926 1 .75 5.918.75 12s5.176 11 11.49 11c6.598 0 11.75-4.72 11.75-11.49 0-.698-.075-1.424-.21-2.225H12.24z"/>
+                </svg>
+                <span>Google 계정으로 계속하기</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 로그인 완료 후 대시보드 메인 화면 -->
+    <div id="app-view" class="hidden">
+        <a href="#main-content" class="skip-link absolute top-0 left-0 bg-indigo-600 text-white px-4 py-2 rounded-b-lg z-[100] transform -translate-y-full transition-transform focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-white">
+            본문 바로가기
+        </a>
+
+        <header class="border-b border-slate-200 bg-white/85 dark:border-slate-800 dark:bg-slate-900/80 backdrop-blur sticky top-0 z-50 transition-colors duration-200">
+            <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <span aria-hidden="true" class="text-2xl">📋</span>
                     <h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">접근성팀 공지사항 정리</h1>
                 </div>
-            </div>
-            
-            <div class="flex items-center gap-3">
-                <!-- 🌓 테마 토글 버튼 추가 -->
-                <button onclick="toggleTheme()" id="theme-toggle" class="px-3 py-1.5 rounded-xl bg-slate-200 text-slate-800 dark:bg-slate-800 dark:text-slate-200 text-xs font-semibold hover:bg-slate-300 dark:hover:bg-slate-770 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500" aria-label="테마 변경">
-                    화면 모드 변경
-                </button>
-                <!-- 실시간 상태 표시등 -->
-                <div class="flex items-center gap-2 text-xs bg-slate-100 border border-slate-200 dark:bg-slate-800 dark:border-transparent px-3 py-1.5 rounded-full text-slate-700 dark:text-slate-200" aria-live="polite">
-                    <span id="db-status-dot" class="w-2 h-2 rounded-full bg-amber-500 animate-pulse" aria-hidden="true"></span>
-                    <span id="db-status-text">데이터베이스 연결 상태 확인 중...</span>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- Main Container -->
-    <main id="main-content" class="max-w-4xl mx-auto px-4 py-8" tabindex="-1">
-        
-        <!-- Search & Filter Controls -->
-        <section class="bg-white border border-slate-200 shadow-sm dark:bg-slate-800/50 dark:border-slate-800 rounded-2xl p-6 mb-6 backdrop-blur-sm transition-colors duration-200" aria-label="검색 및 카테고리 필터">
-            <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
-                
-                <!-- Search Input & Add Button -->
-                <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto items-stretch sm:items-center">
-                    <div class="relative w-full sm:w-72">
-                        <label id="search-label" for="search-input" class="sr-only">공지사항 검색</label>
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400" aria-hidden="true">🔍</span>
-                        <input 
-                            type="search" 
-                            id="search-input"
-                            aria-labelledby="search-label"
-                            placeholder="제목, 내용, 태그 검색..." 
-                            class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-300 text-slate-900 dark:bg-slate-950 dark:border-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                        />
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleTheme()" id="theme-toggle" class="px-3 py-1.5 rounded-xl bg-slate-200 text-slate-800 dark:bg-slate-800 dark:text-slate-200 text-xs font-semibold hover:bg-slate-300 dark:hover:bg-slate-700 transition-all focus:outline-none">화면 모드 변경</button>
+                    <button onclick="handleLogout()" class="px-3 py-1.5 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 text-xs font-semibold hover:bg-rose-500 hover:text-white transition-all focus:outline-none">로그아웃</button>
+                    <div class="flex items-center gap-2 text-xs bg-slate-100 border border-slate-200 dark:bg-slate-800 dark:border-transparent px-3 py-1.5 rounded-full text-slate-700 dark:text-slate-200" aria-live="polite">
+                        <span id="db-status-dot" class="w-2 h-2 rounded-full bg-emerald-500" aria-hidden="true"></span>
+                        <span id="db-status-text">클라우드 동기화 완료</span>
                     </div>
-                    <button onclick="openAddModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-400" aria-haspopup="dialog" aria-controls="add-modal">
-                        <span aria-hidden="true">➕</span> 공지 추가
-                    </button>
-                </div>
-
-                <!-- Category Tabs (WAI-ARIA) -->
-                <div role="tablist" aria-label="공지사항 카테고리 필터" class="flex flex-wrap gap-2 w-full md:w-auto">
-                    <button role="tab" aria-selected="true" aria-controls="announcement-list" id="tab-all" onclick="filterCategory('all')" class="tab-btn px-4 py-2 text-xs font-semibold rounded-lg bg-indigo-600 text-white focus:outline-none transition-all" tabindex="0">전체보기</button>
-                    <button role="tab" aria-selected="false" aria-controls="announcement-list" id="tab-qa" onclick="filterCategory('qa')" class="tab-btn px-4 py-2 text-xs font-semibold rounded-lg bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-750 transition-all" tabindex="-1"><span aria-hidden="true">🔍</span> QA</button>
-                    <button role="tab" aria-selected="false" aria-controls="announcement-list" id="tab-monitoring" onclick="filterCategory('monitoring')" class="tab-btn px-4 py-2 text-xs font-semibold rounded-lg bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-750 transition-all" tabindex="-1"><span aria-hidden="true">📊</span> 모니터링</button>
-                    <button role="tab" aria-selected="false" aria-controls="announcement-list" id="tab-general" onclick="filterCategory('general')" class="tab-btn px-4 py-2 text-xs font-semibold rounded-lg bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-750 transition-all" tabindex="-1"><span aria-hidden="true">📢</span> 기타공지</button>
                 </div>
             </div>
-        </section>
+        </header>
 
-        <!-- 🏷️ 선택된 태그 필터 상태 표시 영역 -->
-        <div id="active-tag-container" class="hidden items-center gap-2 mb-6 bg-indigo-500/10 border border-indigo-500/20 px-4 py-2 rounded-xl text-xs text-indigo-600 dark:text-indigo-300 w-fit">
-            <span id="active-tag-text"></span>
-            <button onclick="clearTagFilter()" class="font-bold hover:bg-indigo-500/20 dark:hover:text-white ml-1 p-1 rounded transition-colors" aria-label="태그 필터 해제 및 전체 목록 보기">✕</button>
-        </div>
+        <main id="main-content" class="max-w-4xl mx-auto px-4 py-8" tabindex="-1">
+            <section class="bg-white border border-slate-200 shadow-sm dark:bg-slate-800/50 dark:border-slate-800 rounded-2xl p-6 mb-6 transition-colors duration-200" aria-label="검색 및 카테고리 필터">
+                <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+                    <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto items-stretch sm:items-center">
+                        <div class="relative w-full sm:w-72">
+                            <label id="search-label" for="search-input" class="sr-only">공지사항 검색</label>
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400" aria-hidden="true">🔍</span>
+                            <input type="search" id="search-input" aria-labelledby="search-label" placeholder="제목, 내용, 태그 검색..." class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-300 text-slate-900 dark:bg-slate-950 dark:border-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                        </div>
+                        <button onclick="openAddModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all focus:outline-none">
+                            <span aria-hidden="true">➕</span> 공지 추가
+                        </button>
+                    </div>
 
-        <!-- Dynamic Screen Reader Announcements -->
-        <div id="sr-announcement" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+                    <div role="tablist" aria-label="공지사항 카테고리 필터" class="flex flex-wrap gap-2 w-full md:w-auto">
+                        <button role="tab" aria-selected="true" aria-controls="announcement-list" id="tab-all" onclick="filterCategory('all')" class="tab-btn px-4 py-2 text-xs font-semibold rounded-lg bg-indigo-600 text-white focus:outline-none" tabindex="0">전체보기</button>
+                        <button role="tab" aria-selected="false" aria-controls="announcement-list" id="tab-qa" onclick="filterCategory('qa')" class="tab-btn px-4 py-2 text-xs font-semibold rounded-lg bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-300 focus:outline-none" tabindex="-1"><span aria-hidden="true">🔍</span> QA</button>
+                        <button role="tab" aria-selected="false" aria-controls="announcement-list" id="tab-monitoring" onclick="filterCategory('monitoring')" class="tab-btn px-4 py-2 text-xs font-semibold rounded-lg bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-300 focus:outline-none" tabindex="-1"><span aria-hidden="true">📊</span> 모니터링</button>
+                        <button role="tab" aria-selected="false" aria-controls="announcement-list" id="tab-general" onclick="filterCategory('general')" class="tab-btn px-4 py-2 text-xs font-semibold rounded-lg bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-300 focus:outline-none" tabindex="-1"><span aria-hidden="true">📢</span> 기타공지</button>
+                    </div>
+                </div>
+            </section>
 
-        <!-- Announcement List -->
-        <section id="announcement-section" aria-labelledby="section-title">
-            <h2 id="section-title" class="sr-only">공지사항 목록</h2>
-            <div id="announcement-list" role="tabpanel" aria-labelledby="tab-all" class="space-y-4">
-                <!-- DB 데이터 로드 공간 -->
+            <div id="active-tag-container" class="hidden items-center gap-2 mb-6 bg-indigo-500/10 border border-indigo-500/20 px-4 py-2 rounded-xl text-xs text-indigo-600 dark:text-indigo-300 w-fit">
+                <span id="active-tag-text"></span>
+                <button onclick="clearTagFilter()" class="font-bold hover:bg-indigo-500/20 ml-1 p-1 rounded" aria-label="태그 필터 해제">✕</button>
             </div>
-        </section>
 
-    </main>
+            <div id="sr-announcement" class="sr-only" aria-live="polite" aria-atomic="true"></div>
 
-    <!-- ♿ 새 공지 등록/수정 모달창 -->
+            <section id="announcement-section" aria-labelledby="section-title">
+                <h2 id="section-title" class="sr-only">공지사항 목록</h2>
+                <div id="announcement-list" role="tabpanel" aria-labelledby="tab-all" class="space-y-4"></div>
+            </section>
+        </main>
+    </div>
+
+    <!-- 새 공지 등록/수정 모달창 -->
     <dialog id="add-modal" class="bg-white text-slate-900 border border-slate-200 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-100 rounded-2xl p-6 max-w-2xl w-full focus:outline-none" aria-labelledby="modal-title">
         <div class="flex justify-between items-center mb-6">
-            <h2 id="modal-title" class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <h2 id="modal-title" class="text-lg font-bold flex items-center gap-2">
                 <span aria-hidden="true">📝</span> <span id="modal-title-text">신규 업무 공지 추가</span>
             </h2>
-            <button type="button" onclick="closeAddModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white text-sm p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800" aria-label="공지사항 작성 창 닫기">
-                ✕
-            </button>
+            <button type="button" onclick="closeAddModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white text-sm p-1.5 rounded-lg hover:bg-slate-100">✕</button>
         </div>
         
         <form id="add-form" class="space-y-4" onsubmit="handleFormSubmit(event)">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label for="form-category" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">카테고리 분류 *</label>
-                    <select id="form-category" required class="w-full bg-white border border-slate-300 text-slate-900 dark:bg-slate-950 dark:border-slate-700 dark:text-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <select id="form-category" required class="w-full bg-white border border-slate-300 text-slate-900 dark:bg-slate-950 dark:border-slate-700 dark:text-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none">
                         <option value="qa"> 🔍 QA</option>
                         <option value="monitoring">📊 모니터링</option>
                         <option value="general">📢 기타공지</option>
@@ -239,29 +172,24 @@
                 </div>
                 <div>
                     <label for="form-date" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">공지 날짜 *</label>
-                    <input type="date" id="form-date" required class="w-full bg-white border border-slate-300 text-slate-900 dark:bg-slate-950 dark:border-slate-700 dark:text-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <input type="date" id="form-date" required class="w-full bg-white border border-slate-300 text-slate-900 dark:bg-slate-950 dark:border-slate-700 dark:text-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none">
                 </div>
             </div>
-
             <div>
                 <label for="form-title" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">공지 제목 *</label>
-                <input type="text" id="form-title" required placeholder="예: QA 우선순위 변경" class="w-full bg-white border border-slate-300 text-slate-900 dark:bg-slate-950 dark:border-slate-700 dark:text-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <input type="text" id="form-title" required placeholder="예: QA 우선순위 변경" class="w-full bg-white border border-slate-300 text-slate-900 dark:bg-slate-950 dark:border-slate-700 dark:text-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none">
             </div>
-
             <div>
                 <label for="form-tags" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">태그 (쉼표로 구분)</label>
-                <input type="text" id="form-tags" placeholder="QA, 모니터링, 지침" class="w-full bg-white border border-slate-300 text-slate-900 dark:bg-slate-950 dark:border-slate-700 dark:text-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <input type="text" id="form-tags" placeholder="QA, 모니터링, 지침" class="w-full bg-white border border-slate-300 text-slate-900 dark:bg-slate-950 dark:border-slate-700 dark:text-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none">
             </div>
-
-            <!-- ✍️ Quill.js 에디터 -->
             <div>
                 <div id="editor-label" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">공지 상세 내용 *</div>
                 <div id="editor-container"></div>
             </div>
-
             <div class="flex justify-end gap-2 pt-4 border-t border-slate-200 dark:border-slate-800">
-                <button type="button" onclick="closeAddModal()" class="px-4 py-2 text-sm font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-750 dark:text-slate-300 rounded-xl transition-all">취소</button>
-                <button id="submit-btn" type="submit" class="px-4 py-2 text-sm font-semibold bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl transition-all">공지 등록</button>
+                <button type="button" onclick="closeAddModal()" class="px-4 py-2 text-sm font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 rounded-xl">취소</button>
+                <button id="submit-btn" type="submit" class="px-4 py-2 text-sm font-semibold bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl">공지 등록</button>
             </div>
         </form>
     </dialog>
@@ -282,21 +210,13 @@
         window.onload = async () => {
             initTheme(); 
             initSupabase();
-            initQuillEditor();
-            await loadData();
-            setupKeyboardNavigation();
-            
-            document.getElementById('search-input').addEventListener('input', (e) => {
-                searchQuery = e.target.value.toLowerCase();
-                renderList();
-            });
+            checkUrlErrors(); // 🚨 [새로 추가] 구글 리다이렉트 시 서버가 던진 RLS 트리거 보안 에러 가로채기
+            checkSession(); 
         };
 
         function initTheme() {
             const savedTheme = localStorage.getItem('theme');
-            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            
-            if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+            if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                 document.documentElement.classList.add('dark');
             } else {
                 document.documentElement.classList.remove('dark');
@@ -308,33 +228,92 @@
             const isDark = document.documentElement.classList.toggle('dark');
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
             updateThemeButton();
-            
-            const srAnnouncement = document.getElementById('sr-announcement');
-            srAnnouncement.textContent = isDark ? "다크 모드가 활성화되었습니다." : "라이트 모드가 활성화되었습니다.";
         }
 
         function updateThemeButton() {
             const btn = document.getElementById('theme-toggle');
-            if(!btn) return;
-            const isDark = document.documentElement.classList.contains('dark');
-            btn.innerHTML = isDark ? "☀️ 라이트모드" : "🌙 다크모드";
-            btn.setAttribute('aria-label', isDark ? "라이트 모드로 전환" : "다크 모드로 전환");
+            if(btn) btn.innerHTML = document.documentElement.classList.contains('dark') ? "☀️ 라이트모드" : "🌙 다크모드";
         }
 
         function initSupabase() {
             try {
                 supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                updateStatus(true, "클라우드 데이터베이스 연결 완료");
-            } catch (err) {
-                updateStatus(false, "DB 연결 실패");
-                console.error(err);
+            } catch (err) { console.error(err); }
+        }
+
+        // 🚨 [새로 추가] URL 해시값 파싱해서 Postgres 트리거 에러 문구 화면에 바인딩
+        function checkUrlErrors() {
+            const hash = window.location.hash;
+            if (hash && hash.includes('error_description')) {
+                const params = new URLSearchParams(hash.replace('#', '?'));
+                let errorDesc = params.get('error_description');
+                if (errorDesc) {
+                    // 구글 로그인 실패 시 깔끔하게 에러 노출
+                    const errorBox = document.getElementById('auth-error-box');
+                    const errorMsg = document.getElementById('auth-error-msg');
+                    
+                    errorMsg.textContent = decodeURIComponent(errorDesc).replace(/\+/g, ' ');
+                    errorBox.classList.replace('hidden', 'flex');
+                    
+                    // 에러 발생 후 깔끔하게 URL 주소창 청소
+                    history.replaceState(null, document.title, window.location.pathname);
+                }
             }
+        }
+
+        function checkSession() {
+            if(!supabaseClient) return;
+            supabaseClient.auth.getSession().then(({ data: { session } }) => {
+                handleAuthView(session);
+            });
+            supabaseClient.auth.onAuthStateChange((event, session) => {
+                handleAuthView(session);
+            });
+        }
+
+        function handleAuthView(session) {
+            const authView = document.getElementById('auth-view');
+            const appView = document.getElementById('app-view');
+
+            if (session) {
+                authView.classList.add('hidden');
+                appView.classList.remove('hidden');
+                if(!quill) { 
+                    initQuillEditor(); 
+                    setupKeyboardNavigation();
+                    document.getElementById('search-input').addEventListener('input', (e) => {
+                        searchQuery = e.target.value.toLowerCase();
+                        renderList();
+                    });
+                }
+                loadData();
+            } else {
+                authView.classList.remove('hidden');
+                appView.classList.add('hidden');
+            }
+        }
+
+        async function handleGoogleLogin() {
+            if(!supabaseClient) return;
+            // 에러 박스 숨김 처리 후 진행
+            document.getElementById('auth-error-box').classList.replace('flex', 'hidden');
+            
+            const redirectUrl = window.location.origin + window.location.pathname;
+            const { error } = await supabaseClient.auth.signInWithOAuth({
+                provider: 'google',
+                options: { redirectTo: redirectUrl }
+            });
+            if (error) { console.error(error); }
+        }
+
+        async function handleLogout() {
+            if(confirm("로그아웃 하시겠습니까?")) { await supabaseClient.auth.signOut(); }
         }
 
         function initQuillEditor() {
             quill = new Quill('#editor-container', {
                 theme: 'snow',
-                placeholder: '다른 위키나 문서에서 복사한 내용을 그대로 붙여넣거나(Ctrl+V), 서식을 활용해 새로운 지침을 작성해 보세요...',
+                placeholder: '다른 위키나 문서에서 복사한 내용을 그대로 붙여넣거나(Ctrl+V) 서식을 편집해 보세요...',
                 modules: {
                     toolbar: [
                         [{ 'header': [1, 2, 3, false] }],                     
@@ -349,80 +328,26 @@
                 }
             });
 
-            // ✨ [Junk Style Filter] 외부 위키에서 복제되어 들어오는 글자 배경색/글씨색 마크업 가로채서 강제 삭제
             quill.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
-                delta.forEach(op => {
-                    if (op.attributes) {
-                        delete op.attributes.background; // 복사해 온 하얀 배경색 압수
-                        delete op.attributes.color;      // 복사해 온 인라인 폰트 컬러 압수
-                    }
-                });
+                delta.forEach(op => { if (op.attributes) { delete op.attributes.background; delete op.attributes.color; } });
                 return delta;
             });
-
-            const quillEditor = document.querySelector('#editor-container .ql-editor');
-            if (quillEditor) {
-                quillEditor.setAttribute('aria-labelledby', 'editor-label');
-            }
             addToolbarTooltips();
         }
 
         function addToolbarTooltips() {
             const isMac = /Mac|iPod|iPhone|iPad/.test(navigator.userAgent);
             const mod = isMac ? '⌘' : 'Ctrl';
-
-            const tooltipMapping = {
-                '.ql-bold': `강조 (${mod} + B)`,
-                '.ql-italic': `기울임 (${mod} + I)`,
-                '.ql-underline': `밑줄 (${mod} + U)`,
-                '.ql-strike': '취소선',
-                '.ql-blockquote': '인용구',
-                '.ql-code-block': '코드 블록',
-                '.ql-list[value="ordered"]': '번호 리스트',
-                '.ql-list[value="bullet"]': '불릿 리스트',
-                '.ql-link': `링크 삽입 (${mod} + K)`,
-                '.ql-image': '이미지 삽입',
-                '.ql-clean': '서식 지우기',
-                '.ql-header': '제목 크기 설정',
-                '.ql-color': '글자 색상',
-                '.ql-background': '글자 배경색',
-                '.ql-align': '정렬'
-            };
-
+            const tooltipMapping = { '.ql-bold': `강조 (${mod} + B)`, '.ql-italic': `기울임 (${mod} + I)`, '.ql-underline': `밑줄 (${mod} + U)`, '.ql-strike': '취소선', '.ql-blockquote': '인용구', '.ql-code-block': '코드 블록', '.ql-list[value="ordered"]': '번호 리스트', '.ql-list[value="bullet"]': '불릿 리스트', '.ql-link': `링크 삽입 (${mod} + K)`, '.ql-image': '이미지 삽입', '.ql-clean': '서식 지우기', '.ql-header': '제목 크기 설정', '.ql-color': '글자 색상', '.ql-background': '글자 배경색', '.ql-align': '정렬' };
             for (const selector in tooltipMapping) {
-                const elements = document.querySelectorAll(`.ql-toolbar ${selector}`);
-                elements.forEach(el => {
-                    el.setAttribute('title', tooltipMapping[selector]);
-                    el.setAttribute('aria-label', tooltipMapping[selector]);
-                });
-            }
-        }
-
-        function updateStatus(isSuccess, text) {
-            const dot = document.getElementById("db-status-dot");
-            const label = document.getElementById("db-status-text");
-            label.textContent = text;
-            if(isSuccess) {
-                dot.className = "w-2 h-2 rounded-full bg-emerald-500"; 
-            } else {
-                dot.className = "w-2 h-2 rounded-full bg-rose-500 animate-pulse";
+                document.querySelectorAll(`.ql-toolbar ${selector}`).forEach(el => { el.setAttribute('title', tooltipMapping[selector]); el.setAttribute('aria-label', tooltipMapping[selector]); });
             }
         }
 
         async function loadData() {
             if(!supabaseClient) return;
-            const { data, error } = await supabaseClient
-                .from('announcements')
-                .select('*')
-                .order('date', { ascending: false }) 
-                .order('created_at', { ascending: false });
-
-            if (error) {
-                console.error("데이터 로드 실패:", error);
-                updateStatus(false, "데이터 동기화 실패");
-                return;
-            }
-
+            const { data, error } = await supabaseClient.from('announcements').select('*').order('date', { ascending: false }).order('created_at', { ascending: false });
+            if (error) { console.error(error); return; }
             announcements = data;
             renderList();
         }
@@ -430,18 +355,14 @@
         function filterByTag(tag) {
             selectedTag = tag;
             const container = document.getElementById('active-tag-container');
-            const textSpan = document.getElementById('active-tag-text');
-            textSpan.textContent = `필터링된 태그: #${tag}`;
-            container.classList.remove('hidden');
-            container.classList.add('flex');
+            document.getElementById('active-tag-text').textContent = `필터링된 태그: #${tag}`;
+            container.classList.replace('hidden', 'flex');
             renderList();
         }
 
         function clearTagFilter() {
             selectedTag = '';
-            const container = document.getElementById('active-tag-container');
-            container.classList.remove('flex');
-            container.classList.add('hidden');
+            document.getElementById('active-tag-container').classList.replace('flex', 'hidden');
             renderList();
             document.getElementById('search-input').focus();
         }
@@ -452,80 +373,38 @@
 
             const filtered = announcements.filter(item => {
                 const matchesCategory = (currentCategory === 'all' || item.category === currentCategory);
-                const matchesSearch = (
-                    item.title.toLowerCase().includes(searchQuery) ||
-                    item.content.toLowerCase().includes(searchQuery) ||
-                    (item.tags && item.tags.some(tag => tag.toLowerCase().includes(searchQuery)))
-                );
-                const matchesTag = !selectedTag || (item.tags && item.tags.includes(selectedTag));
-                return matchesCategory && matchesSearch && matchesTag;
+                const matchesSearch = (item.title.toLowerCase().includes(searchQuery) || item.content.toLowerCase().includes(searchQuery) || (item.tags && item.tags.some(tag => tag.toLowerCase().includes(searchQuery))));
+                return matchesCategory && matchesSearch && (!selectedTag || (item.tags && item.tags.includes(selectedTag)));
             });
 
             if (filtered.length === 0) {
-                listContainer.innerHTML = `
-                    <div class="text-center py-16 bg-white dark:bg-slate-800/20 border border-dashed border-slate-300 dark:border-slate-800 rounded-2xl" role="status">
-                        <span class="text-4xl" aria-hidden="true">🤔</span>
-                        <p class="text-slate-500 dark:text-slate-300 mt-3 text-sm">일치하는 업무 공지사항이 없습니다.</p>
-                    </div>
-                `;
+                listContainer.innerHTML = `<div class="text-center py-16 bg-white dark:bg-slate-800/20 border border-dashed border-slate-300 dark:border-slate-800 rounded-2xl" role="status"><span class="text-4xl" aria-hidden="true">🤔</span><p class="text-slate-500 dark:text-slate-300 mt-3 text-sm">일치하는 업무 공지사항이 없습니다.</p></div>`;
                 return;
             }
 
             filtered.forEach(item => {
-                let catBadge = '';
-                if(item.category === 'qa') {
-                    catBadge = '<span class="bg-rose-500/10 text-rose-600 dark:text-rose-300 text-xs px-2.5 py-1 rounded-full font-semibold border border-rose-500/20"><span aria-hidden="true">🔍 </span>QA</span>';
-                } else if(item.category === 'monitoring') {
-                    catBadge = '<span class="bg-cyan-500/10 text-cyan-600 dark:text-cyan-300 text-xs px-2.5 py-1 rounded-full font-semibold border border-cyan-500/20"><span aria-hidden="true">📊 </span>모니터링</span>';
-                } else {
-                    catBadge = '<span class="bg-amber-500/10 text-amber-600 dark:text-amber-300 text-xs px-2.5 py-1 rounded-full font-semibold border border-amber-500/20"><span aria-hidden="true">📢 </span>기타공지</span>';
-                }
-
+                let catBadge = item.category === 'qa' ? '<span class="bg-rose-500/10 text-rose-600 dark:text-rose-300 text-xs px-2.5 py-1 rounded-full font-semibold border border-rose-500/20"><span aria-hidden="true">🔍 </span>QA</span>' : item.category === 'monitoring' ? '<span class="bg-cyan-500/10 text-cyan-600 dark:text-cyan-300 text-xs px-2.5 py-1 rounded-full font-semibold border border-cyan-500/20"><span aria-hidden="true">📊 </span>모니터링</span>' : '<span class="bg-amber-500/10 text-amber-600 dark:text-amber-300 text-xs px-2.5 py-1 rounded-full font-semibold border border-amber-500/20"><span aria-hidden="true">📢 </span>기타공지</span>';
                 const displayDate = item.date || new Date(item.created_at).toISOString().split('T')[0];
+                const tagBadges = (item.tags || []).map(tag => `<button onclick="filterByTag('${tag}')" class="text-xs text-indigo-600 bg-indigo-50 dark:text-indigo-300 dark:bg-indigo-500/5 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 border border-indigo-200 dark:border-indigo-500/10 px-2 py-0.5 rounded-md transition-colors focus:outline-none" aria-label="${tag} 태그 모아보기">#${tag}</button>`).join(' ');
 
-                const tagBadges = (item.tags || []).map(tag => `
-                    <button onclick="filterByTag('${tag}')" class="text-xs text-indigo-600 bg-indigo-50 dark:text-indigo-300 dark:bg-indigo-500/5 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 border border-indigo-200 dark:border-indigo-500/10 px-2 py-0.5 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-400" aria-label="${tag} 태그 관련 공지 모아보기">
-                        #${tag}
-                    </button>
-                `).join(' ');
-
-                const cardHtml = `
+                listContainer.insertAdjacentHTML('beforeend', `
                     <article class="bg-white border border-slate-200 shadow-sm dark:bg-slate-800/40 dark:border-slate-800/80 rounded-2xl p-6 hover:border-slate-300 dark:hover:border-slate-700 transition-all duration-200" aria-labelledby="post-title-${item.id}">
-                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-                            <div>${catBadge}</div>
-                            <time class="text-xs text-slate-500 dark:text-slate-300" datetime="${displayDate}">${displayDate}</time>
-                        </div>
-                        <h3 id="post-title-${item.id}" class="text-lg font-semibold text-slate-900 dark:text-white mb-2">
-                            <a href="#" class="hover:text-indigo-600 dark:hover:text-indigo-400 focus:outline-none focus:underline transition-colors">${item.title}</a>
-                        </h3>
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3"><div>${catBadge}</div><time class="text-xs text-slate-500 dark:text-slate-300" datetime="${displayDate}">${displayDate}</time></div>
+                        <h3 id="post-title-${item.id}" class="text-lg font-semibold text-slate-900 dark:text-white mb-2"><a href="#" class="hover:text-indigo-600 dark:hover:text-indigo-400 focus:outline-none focus:underline">${item.title}</a></h3>
                         <div class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed mb-4 rich-content">${item.content}</div>
-                        <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100 dark:border-slate-800/85">
-                            <div class="flex flex-wrap gap-1.5" aria-label="관련 태그">${tagBadges}</div>
-                            <div class="flex items-center gap-2">
-                                <button onclick="openEditModal(${item.id})" class="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 hover:underline px-2.5 py-1 rounded" aria-label="'${item.title}' 공지사항 수정">수정하기</button>
-                                <button onclick="deleteAnnouncement(${item.id})" class="text-xs text-rose-600 dark:text-rose-400 hover:text-rose-500 dark:hover:text-rose-300 hover:underline px-2.5 py-1 rounded" aria-label="'${item.title}' 공지사항 삭제">삭제하기</button>
-                            </div>
-                        </div>
+                        <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100 dark:border-slate-800/85"><div class="flex flex-wrap gap-1.5" aria-label="태그">${tagBadges}</div><div class="flex items-center gap-2"><button onclick="openEditModal(${item.id})" class="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 hover:underline px-2.5 py-1 rounded">수정하기</button><button onclick="deleteAnnouncement(${item.id})" class="text-xs text-rose-400 hover:text-rose-300 hover:underline px-2.5 py-1 rounded">삭제하기</button></div></div>
                     </article>
-                `;
-                listContainer.insertAdjacentHTML('beforeend', cardHtml);
+                `);
             });
         }
 
         function filterCategory(category) {
             currentCategory = category;
-            const tabs = document.querySelectorAll('[role="tab"]');
-            tabs.forEach(tab => {
+            document.querySelectorAll('[role="tab"]').forEach(tab => {
                 const isSelected = tab.id === `tab-${category}`;
                 tab.setAttribute('aria-selected', isSelected ? 'true' : 'false');
                 tab.setAttribute('tabindex', isSelected ? '0' : '-1');
-                
-                if (isSelected) {
-                    tab.className = "tab-btn px-4 py-2 text-xs font-semibold rounded-lg bg-indigo-600 text-white focus:outline-none transition-all";
-                    document.getElementById('announcement-list').setAttribute('aria-labelledby', tab.id);
-                } else {
-                    tab.className = "tab-btn px-4 py-2 text-xs font-semibold rounded-lg bg-slate-200 text-slate-700 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-750 focus:outline-none transition-all";
-                }
+                tab.className = isSelected ? "tab-btn px-4 py-2 text-xs font-semibold rounded-lg bg-indigo-600 text-white focus:outline-none" : "tab-btn px-4 py-2 text-xs font-semibold rounded-lg bg-slate-200 text-slate-700 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-755 focus:outline-none";
             });
             renderList();
         }
@@ -536,75 +415,50 @@
             tabList.addEventListener('keydown', (e) => {
                 let currentFocus = Array.from(tabs).indexOf(document.activeElement);
                 if (currentFocus === -1) return;
-
-                if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-                    e.preventDefault();
-                    currentFocus = (currentFocus + 1) % tabs.length;
-                    tabs[currentFocus].focus();
-                    tabs[currentFocus].click();
-                } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-                    e.preventDefault();
-                    currentFocus = (currentFocus - 1 + tabs.length) % tabs.length;
-                    tabs[currentFocus].focus();
-                    tabs[currentFocus].click();
-                }
+                if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); currentFocus = (currentFocus + 1) % tabs.length; tabs[currentFocus].focus(); tabs[currentFocus].click(); }
+                else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); currentFocus = (currentFocus - 1 + tabs.length) % tabs.length; tabs[currentFocus].focus(); tabs[currentFocus].click(); }
             });
         }
 
         function openAddModal() {
-            triggerButton = document.activeElement;
-            editingId = null; 
+            triggerButton = document.activeElement; editingId = null;
             document.getElementById('modal-title-text').textContent = "신규 업무 공지 추가";
             document.getElementById('submit-btn').textContent = "공지 등록";
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('form-date').value = today;
-
-            const modal = document.getElementById('add-modal');
-            modal.showModal();
+            document.getElementById('form-date').value = new Date().toISOString().split('T')[0];
+            document.getElementById('add-modal').showModal();
             document.getElementById('form-category').focus();
         }
 
         function openEditModal(id) {
-            triggerButton = document.activeElement; 
-            editingId = id;
+            triggerButton = document.activeElement; editingId = id;
             const item = announcements.find(a => a.id === id);
             if (!item) return;
 
             document.getElementById('form-category').value = item.category;
             document.getElementById('form-title').value = item.title;
             document.getElementById('form-tags').value = (item.tags || []).join(', ');
-            const storedDate = item.date || new Date(item.created_at).toISOString().split('T')[0];
-            document.getElementById('form-date').value = storedDate;
-            
-            if (quill) {
-                quill.root.innerHTML = item.content; 
-            }
+            document.getElementById('form-date').value = item.date || new Date(item.created_at).toISOString().split('T')[0];
+            if (quill) quill.root.innerHTML = item.content;
+
             document.getElementById('modal-title-text').textContent = "업무 공지 수정";
             document.getElementById('submit-btn').textContent = "수정 완료";
-
-            const modal = document.getElementById('add-modal');
-            modal.showModal();
+            document.getElementById('add-modal').showModal();
             document.getElementById('form-category').focus();
         }
 
         function closeAddModal() {
             document.getElementById('add-modal').close();
             document.getElementById('add-form').reset();
-            if (quill) { quill.setContents([]); }
-            editingId = null; 
-            if (triggerButton) { triggerButton.focus(); }
+            if (quill) quill.setContents([]);
+            editingId = null;
+            if (triggerButton) triggerButton.focus();
         }
 
         async function handleFormSubmit(e) {
             e.preventDefault();
             if(!supabaseClient) return;
 
-            const rawText = quill.getText().trim();
-            if(rawText.length === 0) {
-                alert("공지 상세 내용을 입력해 주세요.");
-                return;
-            }
-
+            if(quill.getText().trim().length === 0) { alert("공지 상세 내용을 입력해 주세요."); return; }
             const content = quill.root.innerHTML;
             const submitBtn = document.getElementById('submit-btn');
             submitBtn.disabled = true;
@@ -612,20 +466,19 @@
             const category = document.getElementById('form-category').value;
             const date = document.getElementById('form-date').value; 
             const title = document.getElementById('form-title').value.trim();
-            const rawTags = document.getElementById('form-tags').value;
-            const tags = rawTags ? rawTags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0) : [];
+            const tags = document.getElementById('form-tags').value ? document.getElementById('form-tags').value.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0) : [];
 
-            let resultError = null;
+            let err = null;
             if (editingId) {
                 const { error } = await supabaseClient.from('announcements').update({ category, title, content, tags, date }).eq('id', editingId);
-                resultError = error;
+                err = error;
             } else {
                 const { error } = await supabaseClient.from('announcements').insert([{ category, title, content, tags, date }]);
-                resultError = error;
+                err = error;
             }
 
             submitBtn.disabled = false;
-            if (resultError) { alert("네트워크 전송 오류"); return; }
+            if (err) { alert("전송 에러 발생"); return; }
             closeAddModal();
             await loadData();
         }
