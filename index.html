@@ -10,6 +10,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- 🔌 Supabase JS Client CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- ✍️ Quill Rich Text Editor CDN (Snow Theme) -->
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+
     <style>
         body { font-family: 'Inter', sans-serif; }
         .skip-link:focus {
@@ -18,6 +22,79 @@
         dialog::backdrop {
             background-color: rgba(2, 6, 23, 0.85);
             backdrop-filter: blur(4px);
+        }
+
+        /* 🎨 Quill 에디터 다크모드 커스텀 스타일 정의 */
+        .ql-toolbar.ql-snow {
+            border-color: #334155 !important; /* slate-700 */
+            background-color: #0f172a !important; /* slate-900 */
+            border-top-left-radius: 0.75rem;
+            border-top-right-radius: 0.75rem;
+        }
+        .ql-container.ql-snow {
+            border-color: #334155 !important; /* slate-700 */
+            background-color: #020617 !important; /* slate-950 */
+            border-bottom-left-radius: 0.75rem;
+            border-bottom-right-radius: 0.75rem;
+            font-family: 'Inter', sans-serif;
+            color: #e2e8f0 !important; /* slate-200 */
+        }
+        .ql-editor {
+            min-height: 200px;
+            font-size: 0.875rem; /* text-sm */
+        }
+        /* 에디터 툴바 버튼 아이콘 색상 보정 */
+        .ql-snow .ql-stroke {
+            stroke: #cbd5e1 !important; /* slate-300 */
+        }
+        .ql-snow .ql-fill {
+            fill: #cbd5e1 !important;
+        }
+        .ql-snow .ql-picker {
+            color: #cbd5e1 !important;
+        }
+        .ql-snow .ql-picker-options {
+            background-color: #0f172a !important;
+            border-color: #334155 !important;
+        }
+        .ql-snow .ql-picker-item {
+            color: #cbd5e1 !important;
+        }
+        /* 툴바 아이콘 활성화/호버 상태 */
+        .ql-snow.ql-toolbar button:hover .ql-stroke,
+        .ql-snow .ql-toolbar button:hover .ql-stroke,
+        .ql-snow.ql-toolbar button.ql-active .ql-stroke,
+        .ql-snow .ql-toolbar button.ql-active .ql-stroke {
+            stroke: #818cf8 !important; /* indigo-400 */
+        }
+        .ql-snow.ql-toolbar button:hover .ql-fill,
+        .ql-snow .ql-toolbar button:hover .ql-fill,
+        .ql-snow.ql-toolbar button.ql-active .ql-fill,
+        .ql-snow .ql-toolbar button.ql-active .ql-fill {
+            fill: #818cf8 !important;
+        }
+
+        /* 📋 저장된 에디터 서식이 카드 내부에서 정상 렌더링되도록 오버라이딩 */
+        .rich-content ul {
+            list-style-type: disc !important;
+            margin-left: 1.5rem !important;
+            margin-top: 0.5rem !important;
+            margin-bottom: 0.5rem !important;
+        }
+        .rich-content ol {
+            list-style-type: decimal !important;
+            margin-left: 1.5rem !important;
+            margin-top: 0.5rem !important;
+            margin-bottom: 0.5rem !important;
+        }
+        .rich-content strong {
+            font-weight: 700 !important;
+        }
+        .rich-content em {
+            font-style: italic !important;
+        }
+        .rich-content p {
+            margin-bottom: 0.5rem !important;
         }
     </style>
 </head>
@@ -99,8 +176,8 @@
 
     </main>
 
-    <!-- ♿ 새 공지 등록 모달창 (카테고리: QA, 모니터링, 기타공지) -->
-    <dialog id="add-modal" class="bg-slate-900 border border-slate-800 text-slate-100 rounded-2xl p-6 max-w-lg w-full focus:outline-none" aria-labelledby="modal-title">
+    <!-- ♿ 새 공지 등록 모달창 (카테고리: QA, 모니터링, 기타공지 & Rich Editor 탑재) -->
+    <dialog id="add-modal" class="bg-slate-900 border border-slate-800 text-slate-100 rounded-2xl p-6 max-w-xl w-full focus:outline-none" aria-labelledby="modal-title">
         <div class="flex justify-between items-center mb-6">
             <h2 id="modal-title" class="text-lg font-bold text-white flex items-center gap-2">
                 <span aria-hidden="true">📝</span> 신규 업무 공지 추가
@@ -130,9 +207,10 @@
                 <input type="text" id="form-tags" placeholder="QA, 모니터링, 지침" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
             </div>
 
+            <!-- ✍️ Quill.js 에디터 컨테이너 장착 -->
             <div>
-                <label for="form-content" class="block text-xs font-semibold text-slate-300 mb-1.5">공지 상세 내용 *</label>
-                <textarea id="form-content" required rows="5" placeholder="회의 도중 공유된 구체적인 실행 절차나 업무 준수 사항을 작성하세요." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                <div id="editor-label" class="block text-xs font-semibold text-slate-300 mb-1.5">공지 상세 내용 *</div>
+                <div id="editor-container"></div>
             </div>
 
             <div class="flex justify-end gap-2 pt-4 border-t border-slate-800">
@@ -153,9 +231,11 @@
         let searchQuery = '';
         let selectedTag = ''; // 🏷️ 해시태그 필터링 상태
         let triggerButton = null;
+        let quill = null; // ✍️ 에디터 객체 변수
 
         window.onload = async () => {
             initSupabase();
+            initQuillEditor();
             await loadData();
             setupKeyboardNavigation();
             
@@ -173,6 +253,28 @@
             } catch (err) {
                 updateStatus(false, "DB 연결 실패");
                 console.error(err);
+            }
+        }
+
+        // ✍️ Quill Rich Editor 초기화 함수
+        function initQuillEditor() {
+            quill = new Quill('#editor-container', {
+                theme: 'snow',
+                placeholder: '회의 도중 공유된 구체적인 실행 절차나 볼드, 리스트 서식 등을 사용해 상세히 기록해 보세요...',
+                modules: {
+                    toolbar: [
+                        ['bold', 'italic', 'underline', 'strike'],             // 텍스트 기본 스타일링
+                        [{ 'color': [] }, { 'background': [] }],               // 글자 색상, 글자 배경색 커스텀
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],         // 넘버링, 불릿 리스트
+                        ['clean']                                              // 포맷 초기화
+                    ]
+                }
+            });
+
+            // ♿ 스크린 리더용 ARIA 속성 주입
+            const quillEditor = document.querySelector('#editor-container .ql-editor');
+            if (quillEditor) {
+                quillEditor.setAttribute('aria-labelledby', 'editor-label');
             }
         }
 
@@ -293,6 +395,7 @@
                     </button>
                 `).join(' ');
 
+                // 📝 item.content에는 이제 풍부한 HTML 마크업이 직접 담기므로 그대로 출력 (rich-content 스타일 적용)
                 const cardHtml = `
                     <article class="bg-slate-800/40 border border-slate-800/80 rounded-2xl p-6 hover:border-slate-700 hover:bg-slate-800/60 focus-within:ring-2 focus-within:ring-indigo-500 transition-all duration-200" aria-labelledby="post-title-${item.id}">
                         <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
@@ -302,7 +405,7 @@
                         <h3 id="post-title-${item.id}" class="text-lg font-semibold text-white mb-2">
                             <a href="#" class="hover:text-indigo-400 focus:outline-none focus:underline transition-colors">${item.title}</a>
                         </h3>
-                        <p class="text-sm text-slate-300 leading-relaxed mb-4 whitespace-pre-line">${item.content}</p>
+                        <div class="text-sm text-slate-300 leading-relaxed mb-4 rich-content">${item.content}</div>
                         <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-800/85">
                             <div class="flex flex-wrap gap-1.5" aria-label="관련 태그">${tagBadges}</div>
                             <button onclick="deleteAnnouncement(${item.id})" class="text-xs text-rose-400 hover:text-rose-300 hover:underline px-2.5 py-1 rounded" aria-label="'${item.title}' 공지사항 삭제">삭제하기</button>
@@ -368,6 +471,12 @@
             const modal = document.getElementById('add-modal');
             modal.close();
             document.getElementById('add-form').reset();
+            
+            // ✍️ 모달 닫을 때 에디터 초기화
+            if (quill) {
+                quill.setContents([]); 
+            }
+
             if (triggerButton) {
                 triggerButton.focus();
             }
@@ -381,13 +490,22 @@
                 return;
             }
 
+            // ✍️ Quill 에디터의 순수 텍스트 길이 측정 후 검증
+            const rawText = quill.getText().trim();
+            if(rawText.length === 0) {
+                alert("공지 상세 내용을 입력해 주세요.");
+                return;
+            }
+
+            // ✍️ 에디터 내부의 HTML 소스 코드 그대로 추출
+            const content = quill.root.innerHTML;
+
             const submitBtn = document.getElementById('submit-btn');
             submitBtn.disabled = true;
             submitBtn.textContent = "등록 중...";
 
             const category = document.getElementById('form-category').value;
             const title = document.getElementById('form-title').value.trim();
-            const content = document.getElementById('form-content').value.trim();
             const rawTags = document.getElementById('form-tags').value;
             const tags = rawTags ? rawTags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0) : [];
 
