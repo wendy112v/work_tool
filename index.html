@@ -6,6 +6,12 @@
     <title>📋 접근성팀 공지사항 정리</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // 🌓 Tailwind 다크모드 설정을 class 기반으로 활성화
+        tailwind.config = {
+            darkMode: 'class'
+        }
+    </script>
     <!-- Google Fonts (Inter) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- 🔌 Supabase JS Client CDN -->
@@ -24,179 +30,108 @@
             backdrop-filter: blur(4px);
         }
 
-        /* 🎨 Quill 에디터 다크모드 위키 테마 커스텀 */
+        /* 🎨 Quill 에디터 표준 라이트모드 스타일 */
         .ql-toolbar.ql-snow {
-            border-color: #334155 !important; /* slate-700 */
-            background-color: #0f172a !important; /* slate-900 */
+            border-color: #cbd5e1 !important; /* slate-300 */
+            background-color: #f8fafc !important; /* slate-50 */
             border-top-left-radius: 0.75rem;
             border-top-right-radius: 0.75rem;
         }
         .ql-container.ql-snow {
-            border-color: #334155 !important; /* slate-700 */
-            background-color: #020617 !important; /* slate-950 */
+            border-color: #cbd5e1 !important;
+            background-color: #ffffff !important;
             border-bottom-left-radius: 0.75rem;
             border-bottom-right-radius: 0.75rem;
             font-family: 'Inter', sans-serif;
-            color: #e2e8f0 !important; /* slate-200 */
+            color: #0f172a !important; /* slate-900 */
         }
         .ql-editor {
             min-height: 250px;
-            font-size: 0.875rem; /* text-sm */
-        }
-        /* 에디터 툴바 버튼 아이콘 색상 보정 */
-        .ql-snow .ql-stroke {
-            stroke: #cbd5e1 !important; /* slate-300 */
-        }
-        .ql-snow .ql-fill {
-            fill: #cbd5e1 !important;
-        }
-        .ql-snow .ql-picker {
-            color: #cbd5e1 !important;
-        }
-        .ql-snow .ql-picker-options {
-            background-color: #0f172a !important;
-            border-color: #334155 !important;
-        }
-        .ql-snow .ql-picker-item {
-            color: #cbd5e1 !important;
-        }
-        /* 툴바 아이콘 활성화/호버 상태 */
-        .ql-snow.ql-toolbar button:hover .ql-stroke,
-        .ql-snow .ql-toolbar button:hover .ql-stroke,
-        .ql-snow.ql-toolbar button.ql-active .ql-stroke,
-        .ql-snow .ql-toolbar button.ql-active .ql-stroke {
-            stroke: #818cf8 !important; /* indigo-400 */
-        }
-        .ql-snow.ql-toolbar button:hover .ql-fill,
-        .ql-snow .ql-toolbar button:hover .ql-fill,
-        .ql-snow.ql-toolbar button.ql-active .ql-fill,
-        .ql-snow .ql-toolbar button.ql-active .ql-fill {
-            fill: #818cf8 !important;
+            font-size: 0.875rem;
         }
 
-        /* 📋 위키 콘텐츠 카드 내부 렌더링 스타일 규격화 */
-        .rich-content h1 {
-            font-size: 1.5rem !important;
-            font-weight: 700 !important;
-            margin-top: 1.25rem !important;
-            margin-bottom: 0.5rem !important;
-            color: #ffffff !important;
+        /* 🌙 Quill 에디터 다크모드 테마 스위칭 (.dark 클래스 스코핑) */
+        .dark .ql-toolbar.ql-snow {
+            border-color: #334155 !important; /* slate-700 */
+            background-color: #0f172a !important; /* slate-900 */
         }
-        .rich-content h2 {
-            font-size: 1.25rem !important;
-            font-weight: 600 !important;
-            margin-top: 1rem !important;
-            margin-bottom: 0.5rem !important;
-            color: #f1f5f9 !important;
+        .dark .ql-container.ql-snow {
+            border-color: #334155 !important;
+            background-color: #020617 !important; /* slate-950 */
+            color: #e2e8f0 !important; /* slate-200 */
         }
-        .rich-content h3 {
-            font-size: 1.125rem !important;
-            font-weight: 650 !important;
-            margin-top: 0.875rem !important;
-            margin-bottom: 0.5rem !important;
+        .dark .ql-editor {
             color: #e2e8f0 !important;
         }
-        .rich-content ul {
-            list-style-type: disc !important;
-            margin-left: 1.5rem !important;
-            margin-top: 0.5rem !important;
-            margin-bottom: 0.5rem !important;
+        .dark .ql-snow .ql-stroke { stroke: #cbd5e1 !important; }
+        .dark .ql-snow .ql-fill { fill: #cbd5e1 !important; }
+        .dark .ql-snow .ql-picker { color: #cbd5e1 !important; }
+        .dark .ql-snow .ql-picker-options { background-color: #0f172a !important; border-color: #334155 !important; }
+        .dark .ql-snow .ql-picker-item { color: #cbd5e1 !important; }
+        .dark .ql-snow.ql-toolbar button:hover .ql-stroke,
+        .dark .ql-snow .ql-toolbar button:hover .ql-stroke,
+        .dark .ql-snow.ql-toolbar button.ql-active .ql-stroke,
+        .dark .ql-snow .ql-toolbar button.ql-active .ql-stroke {
+            stroke: #818cf8 !important; /* indigo-400 */
         }
-        .rich-content ol {
-            list-style-type: decimal !important;
-            margin-left: 1.5rem !important;
-            margin-top: 0.5rem !important;
-            margin-bottom: 0.5rem !important;
-        }
-        .rich-content li {
-            margin-bottom: 0.25rem !important;
-        }
-        .rich-content strong {
-            font-weight: 700 !important;
-        }
-        .rich-content em {
-            font-style: italic !important;
-        }
+
+        /* 📋 위키 콘텐츠 카드 내부 렌더링 가독성 및 명암비 규격화 (라이트/다크 통합 대응) */
+        .rich-content h1 { font-size: 1.5rem !important; font-weight: 700 !important; margin-top: 1.25rem !important; margin-bottom: 0.5rem !important; }
+        .rich-content h2 { font-size: 1.25rem !important; font-weight: 600 !important; margin-top: 1rem !important; margin-bottom: 0.5rem !important; }
+        .rich-content h3 { font-size: 1.125rem !important; font-weight: 650 !important; margin-top: 0.875rem !important; margin-bottom: 0.5rem !important; }
+        .rich-content ul { list-style-type: disc !important; margin-left: 1.5rem !important; margin-top: 0.5rem !important; margin-bottom: 0.5rem !important; }
+        .rich-content ol { list-style-type: decimal !important; margin-left: 1.5rem !important; margin-top: 0.5rem !important; margin-bottom: 0.5rem !important; }
+        .rich-content li { margin-bottom: 0.25rem !important; }
+        .rich-content strong { font-weight: 700 !important; }
+        .rich-content em { font-style: italic !important; }
+        .rich-content p { margin-bottom: 0.5rem !important; }
+        
+        /* 하이퍼링크 테마 스위칭 */
+        .rich-content a { color: #4f46e5 !important; text-decoration: underline !important; }
+        .dark .rich-content a { color: #818cf8 !important; }
+        
+        /* 인용구(Blockquote) 테마 스위칭 */
         .rich-content blockquote {
-            border-left: 4px solid #6366f1 !important; /* indigo-500 */
-            padding-left: 1rem !important;
-            margin: 0.75rem 0 !important;
-            color: #94a3b8 !important; /* slate-400 */
-            font-style: italic !important;
+            border-left: 4px solid #4f46e5 !important; padding-left: 1rem !important; margin: 0.75rem 0 !important;
+            color: #475569 !important; font-style: italic !important; background-color: rgba(79, 70, 229, 0.03);
+            padding-top: 0.25rem; padding-bottom: 0.25rem; border-radius: 0 0.375rem 0.375rem 0;
+        }
+        .dark .rich-content blockquote {
+            border-left: 4px solid #6366f1 !important; color: #94a3b8 !important;
             background-color: rgba(99, 102, 241, 0.05);
-            padding-top: 0.25rem;
-            padding-bottom: 0.25rem;
-            border-radius: 0 0.375rem 0.375rem 0;
         }
+
+        /* 코드 블록(Pre) 테마 스위칭 */
         .rich-content pre {
-            background-color: #020617 !important; /* slate-950 */
-            border: 1px solid #334155 !important; /* slate-700 */
-            padding: 0.75rem !important;
-            border-radius: 0.5rem !important;
-            font-family: monospace !important;
-            margin: 0.75rem 0 !important;
-            overflow-x: auto !important;
-            color: #cbd5e1 !important;
+            background-color: #f8fafc !important; border: 1px solid #cbd5e1 !important;
+            padding: 0.75rem !important; border-radius: 0.5rem !important; font-family: monospace !important;
+            margin: 0.75rem 0 !important; overflow-x: auto !important; color: #334155 !important;
         }
-        .rich-content code {
-            background-color: #0f172a !important; /* slate-900 */
-            padding: 0.2rem 0.4rem !important;
-            border-radius: 0.25rem !important;
-            font-family: monospace !important;
-            color: #f43f5e !important; /* rose-500 */
-        }
-        .rich-content a {
-            color: #818cf8 !important; /* indigo-400 */
-            text-decoration: underline !important;
-        }
-        .rich-content a:hover {
-            color: #a5b4fc !important; /* indigo-300 */
-        }
-        .rich-content img {
-            max-width: 100% !important;
-            height: auto !important;
-            border-radius: 0.5rem !important;
-            margin: 0.75rem 0 !important;
-        }
-        .rich-content p {
-            margin-bottom: 0.5rem !important;
-        }
+        .dark .rich-content pre { background-color: #020617 !important; border: 1px solid #334155 !important; color: #cbd5e1 !important; }
 
-        /* 📋 표(Table) 다크모드 대응 초정밀 CSS */
-        .rich-content table {
-            border-collapse: collapse !important;
-            width: 100% !important;
-            margin: 1.25rem 0 !important;
-            font-size: 0.875rem !important;
-            border-radius: 0.5rem !important;
-            overflow: hidden !important;
-            border: 1px solid #334155 !important; /* slate-700 */
-        }
-        .rich-content th, .rich-content td {
-            border: 1px solid #334155 !important;
-            padding: 0.625rem 0.875rem !important;
-            text-align: left !important;
-        }
-        .rich-content th {
-            background-color: #0f172a !important; /* slate-900 */
-            font-weight: 600 !important;
-            color: #ffffff !important;
-        }
-        .rich-content tr:nth-child(even) {
-            background-color: rgba(255, 255, 255, 0.02) !important;
-        }
+        /* 인라인 코드 테마 스위칭 */
+        .rich-content code { background-color: #f1f5f9 !important; padding: 0.2rem 0.4rem !important; border-radius: 0.25rem !important; font-family: monospace !important; color: #dc2626 !important; }
+        .dark .rich-content code { background-color: #0f172a !important; color: #f43f5e !important; }
 
-        /* 📋 체크박스(할 일 목록) 대응 커스텀 */
-        .rich-content input[type="checkbox"] {
-            margin-right: 0.5rem !important;
-            accent-color: #6366f1 !important; /* indigo-500 */
-            pointer-events: none !important;
-            transform: scale(1.1) !important;
-            vertical-align: middle !important;
-        }
+        /* 이미지 삽입 */
+        .rich-content img { max-width: 100% !important; height: auto !important; border-radius: 0.5rem !important; margin: 0.75rem 0 !important; }
+
+        /* 위키 표(Table) 대응 테마별 복붙 최적화 정밀 CSS */
+        .rich-content table { border-collapse: collapse !important; width: 100% !important; margin: 1.25rem 0 !important; font-size: 0.875rem !important; border-radius: 0.5rem !important; overflow: hidden !important; border: 1px solid #cbd5e1 !important; }
+        .dark .rich-content table { border: 1px solid #334155 !important; }
+        .rich-content th, .rich-content td { border: 1px solid #cbd5e1 !important; padding: 0.625rem 0.875rem !important; text-align: left !important; }
+        .dark .rich-content th, .dark .rich-content td { border: 1px solid #334155 !important; }
+        .rich-content th { background-color: #f1f5f9 !important; font-weight: 600 !important; color: #0f172a !important; }
+        .dark .rich-content th { background-color: #0f172a !important; color: #ffffff !important; }
+        .rich-content tr:nth-child(even) { background-color: rgba(0, 0, 0, 0.01) !important; }
+        .dark .rich-content tr:nth-child(even) { background-color: rgba(255, 255, 255, 0.02) !important; }
+
+        /* 체크박스 대응 */
+        .rich-content input[type="checkbox"] { margin-right: 0.5rem !important; accent-color: #4f46e5 !important; pointer-events: none !important; transform: scale(1.1) !important; vertical-align: middle !important; }
+        .dark .rich-content input[type="checkbox"] { accent-color: #6366f1 !important; }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen">
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100 min-h-screen transition-colors duration-200">
 
     <!-- 1. 키보드 사용자용 스킵 링크 -->
     <a href="#main-content" class="skip-link absolute top-0 left-0 bg-indigo-600 text-white px-4 py-2 rounded-b-lg z-[100] transform -translate-y-full transition-transform focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-white">
@@ -204,18 +139,25 @@
     </a>
 
     <!-- Header Section -->
-    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+    <header class="border-b border-slate-200 bg-white/85 dark:border-slate-800 dark:bg-slate-900/80 backdrop-blur sticky top-0 z-50 transition-colors duration-200">
         <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
             <div class="flex items-center gap-3">
                 <span aria-hidden="true" class="text-2xl">📋</span>
                 <div>
-                    <h1 class="text-xl font-bold tracking-tight text-white">접근성팀 공지사항 정리</h1>
+                    <h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">접근성팀 공지사항 정리</h1>
                 </div>
             </div>
-            <!-- 실시간 상태 표시등 -->
-            <div class="flex items-center gap-2 text-xs bg-slate-800 px-3 py-1.5 rounded-full text-slate-200" aria-live="polite">
-                <span id="db-status-dot" class="w-2 h-2 rounded-full bg-amber-500 animate-pulse" aria-hidden="true"></span>
-                <span id="db-status-text">데이터베이스 연결 상태 확인 중...</span>
+            
+            <div class="flex items-center gap-3">
+                <!-- 🌓 테마 토글 버튼 추가 -->
+                <button onclick="toggleTheme()" id="theme-toggle" class="px-3 py-1.5 rounded-xl bg-slate-200 text-slate-800 dark:bg-slate-800 dark:text-slate-200 text-xs font-semibold hover:bg-slate-300 dark:hover:bg-slate-770 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500" aria-label="테마 변경">
+                    화면 모드 변경
+                </button>
+                <!-- 실시간 상태 표시등 -->
+                <div class="flex items-center gap-2 text-xs bg-slate-100 border border-slate-200 dark:bg-slate-800 dark:border-transparent px-3 py-1.5 rounded-full text-slate-700 dark:text-slate-200" aria-live="polite">
+                    <span id="db-status-dot" class="w-2 h-2 rounded-full bg-amber-500 animate-pulse" aria-hidden="true"></span>
+                    <span id="db-status-text">데이터베이스 연결 상태 확인 중...</span>
+                </div>
             </div>
         </div>
     </header>
@@ -224,7 +166,7 @@
     <main id="main-content" class="max-w-4xl mx-auto px-4 py-8" tabindex="-1">
         
         <!-- Search & Filter Controls -->
-        <section class="bg-slate-800/50 border border-slate-800 rounded-2xl p-6 mb-6 backdrop-blur-sm" aria-label="검색 및 카테고리 필터">
+        <section class="bg-white border border-slate-200 shadow-sm dark:bg-slate-800/50 dark:border-slate-800 rounded-2xl p-6 mb-6 backdrop-blur-sm transition-colors duration-200" aria-label="검색 및 카테고리 필터">
             <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
                 
                 <!-- Search Input & Add Button -->
@@ -237,7 +179,7 @@
                             id="search-input"
                             aria-labelledby="search-label"
                             placeholder="제목, 내용, 태그 검색..." 
-                            class="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-sm text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                            class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-300 text-slate-900 dark:bg-slate-950 dark:border-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                         />
                     </div>
                     <button onclick="openAddModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-400" aria-haspopup="dialog" aria-controls="add-modal">
@@ -248,17 +190,17 @@
                 <!-- Category Tabs (WAI-ARIA) -->
                 <div role="tablist" aria-label="공지사항 카테고리 필터" class="flex flex-wrap gap-2 w-full md:w-auto">
                     <button role="tab" aria-selected="true" aria-controls="announcement-list" id="tab-all" onclick="filterCategory('all')" class="tab-btn px-4 py-2 text-xs font-semibold rounded-lg bg-indigo-600 text-white focus:outline-none transition-all" tabindex="0">전체보기</button>
-                    <button role="tab" aria-selected="false" aria-controls="announcement-list" id="tab-qa" onclick="filterCategory('qa')" class="tab-btn px-4 py-2 text-xs font-semibold rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-750 transition-all" tabindex="-1"><span aria-hidden="true">🔍</span> QA</button>
-                    <button role="tab" aria-selected="false" aria-controls="announcement-list" id="tab-monitoring" onclick="filterCategory('monitoring')" class="tab-btn px-4 py-2 text-xs font-semibold rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-750 transition-all" tabindex="-1"><span aria-hidden="true">📊</span> 모니터링</button>
-                    <button role="tab" aria-selected="false" aria-controls="announcement-list" id="tab-general" onclick="filterCategory('general')" class="tab-btn px-4 py-2 text-xs font-semibold rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-750 transition-all" tabindex="-1"><span aria-hidden="true">📢</span> 기타공지</button>
+                    <button role="tab" aria-selected="false" aria-controls="announcement-list" id="tab-qa" onclick="filterCategory('qa')" class="tab-btn px-4 py-2 text-xs font-semibold rounded-lg bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-750 transition-all" tabindex="-1"><span aria-hidden="true">🔍</span> QA</button>
+                    <button role="tab" aria-selected="false" aria-controls="announcement-list" id="tab-monitoring" onclick="filterCategory('monitoring')" class="tab-btn px-4 py-2 text-xs font-semibold rounded-lg bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-750 transition-all" tabindex="-1"><span aria-hidden="true">📊</span> 모니터링</button>
+                    <button role="tab" aria-selected="false" aria-controls="announcement-list" id="tab-general" onclick="filterCategory('general')" class="tab-btn px-4 py-2 text-xs font-semibold rounded-lg bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-750 transition-all" tabindex="-1"><span aria-hidden="true">📢</span> 기타공지</button>
                 </div>
             </div>
         </section>
 
-        <!-- 🏷️ 선택된 태그 필터 상태 표시 영역 (a11y 준수) -->
-        <div id="active-tag-container" class="hidden items-center gap-2 mb-6 bg-indigo-500/10 border border-indigo-500/20 px-4 py-2 rounded-xl text-xs text-indigo-300 w-fit">
+        <!-- 🏷️ 선택된 태그 필터 상태 표시 영역 -->
+        <div id="active-tag-container" class="hidden items-center gap-2 mb-6 bg-indigo-500/10 border border-indigo-500/20 px-4 py-2 rounded-xl text-xs text-indigo-600 dark:text-indigo-300 w-fit">
             <span id="active-tag-text"></span>
-            <button onclick="clearTagFilter()" class="font-bold hover:text-white ml-1 p-1 rounded hover:bg-indigo-500/20" aria-label="태그 필터 해제 및 전체 목록 보기">✕</button>
+            <button onclick="clearTagFilter()" class="font-bold hover:bg-indigo-500/20 dark:hover:text-white ml-1 p-1 rounded transition-colors" aria-label="태그 필터 해제 및 전체 목록 보기">✕</button>
         </div>
 
         <!-- Dynamic Screen Reader Announcements -->
@@ -274,60 +216,57 @@
 
     </main>
 
-    <!-- ♿ 새 공지 등록/수정 모달창 (공지 날짜 지정 기능 추가) -->
-    <dialog id="add-modal" class="bg-slate-900 border border-slate-800 text-slate-100 rounded-2xl p-6 max-w-2xl w-full focus:outline-none" aria-labelledby="modal-title">
+    <!-- ♿ 새 공지 등록/수정 모달창 -->
+    <dialog id="add-modal" class="bg-white text-slate-900 border border-slate-200 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-100 rounded-2xl p-6 max-w-2xl w-full focus:outline-none" aria-labelledby="modal-title">
         <div class="flex justify-between items-center mb-6">
-            <h2 id="modal-title" class="text-lg font-bold text-white flex items-center gap-2">
+            <h2 id="modal-title" class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
                 <span aria-hidden="true">📝</span> <span id="modal-title-text">신규 업무 공지 추가</span>
             </h2>
-            <button onclick="closeAddModal()" class="text-slate-400 hover:text-white text-sm p-1.5 rounded-lg hover:bg-slate-800" aria-label="공지사항 작성 창 닫기">
+            <button type="button" onclick="closeAddModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white text-sm p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800" aria-label="공지사항 작성 창 닫기">
                 ✕
             </button>
         </div>
         
         <form id="add-form" class="space-y-4" onsubmit="handleFormSubmit(event)">
-            <!-- 분류 및 날짜 묶음 영역 -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label for="form-category" class="block text-xs font-semibold text-slate-300 mb-1.5">카테고리 분류 *</label>
-                    <select id="form-category" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        <option value="qa">🔍 QA</option>
+                    <label for="form-category" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">카테고리 분류 *</label>
+                    <select id="form-category" required class="w-full bg-white border border-slate-300 text-slate-900 dark:bg-slate-950 dark:border-slate-700 dark:text-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="qa"> 🔍 QA</option>
                         <option value="monitoring">📊 모니터링</option>
                         <option value="general">📢 기타공지</option>
                     </select>
                 </div>
                 <div>
-                    <!-- 📅 수동 공지 날짜 지정 기능 추가 -->
-                    <label for="form-date" class="block text-xs font-semibold text-slate-300 mb-1.5">공지 날짜 *</label>
-                    <input type="date" id="form-date" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <label for="form-date" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">공지 날짜 *</label>
+                    <input type="date" id="form-date" required class="w-full bg-white border border-slate-300 text-slate-900 dark:bg-slate-950 dark:border-slate-700 dark:text-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
             </div>
 
             <div>
-                <label for="form-title" class="block text-xs font-semibold text-slate-300 mb-1.5">공지 제목 *</label>
-                <input type="text" id="form-title" required placeholder="예: QA 우선순위 변경" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <label for="form-title" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">공지 제목 *</label>
+                <input type="text" id="form-title" required placeholder="예: QA 우선순위 변경" class="w-full bg-white border border-slate-300 text-slate-900 dark:bg-slate-950 dark:border-slate-700 dark:text-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
             </div>
 
             <div>
-                <label for="form-tags" class="block text-xs font-semibold text-slate-300 mb-1.5">태그 (쉼표로 구분)</label>
-                <input type="text" id="form-tags" placeholder="QA, 모니터링, 지침" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <label for="form-tags" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">태그 (쉼표로 구분)</label>
+                <input type="text" id="form-tags" placeholder="QA, 모니터링, 지침" class="w-full bg-white border border-slate-300 text-slate-900 dark:bg-slate-950 dark:border-slate-700 dark:text-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
             </div>
 
-            <!-- ✍️ Quill.js Wiki 에디터 적용 -->
+            <!-- ✍️ Quill.js 에디터 -->
             <div>
-                <div id="editor-label" class="block text-xs font-semibold text-slate-300 mb-1.5">공지 상세 내용 *</div>
+                <div id="editor-label" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">공지 상세 내용 *</div>
                 <div id="editor-container"></div>
             </div>
 
-            <div class="flex justify-end gap-2 pt-4 border-t border-slate-800">
-                <button type="button" onclick="closeAddModal()" class="px-4 py-2 text-sm font-semibold bg-slate-800 hover:bg-slate-750 text-slate-300 rounded-xl transition-all">취소</button>
+            <div class="flex justify-end gap-2 pt-4 border-t border-slate-200 dark:border-slate-800">
+                <button type="button" onclick="closeAddModal()" class="px-4 py-2 text-sm font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-750 dark:text-slate-300 rounded-xl transition-all">취소</button>
                 <button id="submit-btn" type="submit" class="px-4 py-2 text-sm font-semibold bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl transition-all">공지 등록</button>
             </div>
         </form>
     </dialog>
 
     <script>
-        // 🔒 빌트인된 Supabase 인증 정보
         const SUPABASE_URL = "https://cqrvqcsupdgsxgtpfxtd.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxcnZxY3N1cGRnc3hndHBmeHRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQwNzk3MjcsImV4cCI6MjA5OTY1NTcyN30.NCUfjIvijawwy3v-wSaQXyzEioo_GK50QseGVpqXIqU";
 
@@ -341,6 +280,7 @@
         let editingId = null; 
 
         window.onload = async () => {
+            initTheme(); 
             initSupabase();
             initQuillEditor();
             await loadData();
@@ -352,7 +292,35 @@
             });
         };
 
-        // Supabase 초기화 및 연결
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+            updateThemeButton();
+        }
+
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            updateThemeButton();
+            
+            const srAnnouncement = document.getElementById('sr-announcement');
+            srAnnouncement.textContent = isDark ? "다크 모드가 활성화되었습니다." : "라이트 모드가 활성화되었습니다.";
+        }
+
+        function updateThemeButton() {
+            const btn = document.getElementById('theme-toggle');
+            if(!btn) return;
+            const isDark = document.documentElement.classList.contains('dark');
+            btn.innerHTML = isDark ? "☀️ 라이트모드" : "🌙 다크모드";
+            btn.setAttribute('aria-label', isDark ? "라이트 모드로 전환" : "다크 모드로 전환");
+        }
+
         function initSupabase() {
             try {
                 supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -363,7 +331,6 @@
             }
         }
 
-        // ✍️ Quill Rich Editor 초기화
         function initQuillEditor() {
             quill = new Quill('#editor-container', {
                 theme: 'snow',
@@ -382,15 +349,24 @@
                 }
             });
 
+            // ✨ [Junk Style Filter] 외부 위키에서 복제되어 들어오는 글자 배경색/글씨색 마크업 가로채서 강제 삭제
+            quill.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
+                delta.forEach(op => {
+                    if (op.attributes) {
+                        delete op.attributes.background; // 복사해 온 하얀 배경색 압수
+                        delete op.attributes.color;      // 복사해 온 인라인 폰트 컬러 압수
+                    }
+                });
+                return delta;
+            });
+
             const quillEditor = document.querySelector('#editor-container .ql-editor');
             if (quillEditor) {
                 quillEditor.setAttribute('aria-labelledby', 'editor-label');
             }
-
             addToolbarTooltips();
         }
 
-        // 🏷️ 툴바 툴팁 & 단축키 자동 매핑
         function addToolbarTooltips() {
             const isMac = /Mac|iPod|iPhone|iPad/.test(navigator.userAgent);
             const mod = isMac ? '⌘' : 'Ctrl';
@@ -433,13 +409,12 @@
             }
         }
 
-        // DB에서 데이터 가져오기
         async function loadData() {
             if(!supabaseClient) return;
             const { data, error } = await supabaseClient
                 .from('announcements')
                 .select('*')
-                .order('date', { ascending: false }) // 공지 등록 날짜 순으로 정렬 변경
+                .order('date', { ascending: false }) 
                 .order('created_at', { ascending: false });
 
             if (error) {
@@ -452,7 +427,6 @@
             renderList();
         }
 
-        // 🏷️ 특정 해시태그 클릭 필터
         function filterByTag(tag) {
             selectedTag = tag;
             const container = document.getElementById('active-tag-container');
@@ -460,28 +434,18 @@
             textSpan.textContent = `필터링된 태그: #${tag}`;
             container.classList.remove('hidden');
             container.classList.add('flex');
-
             renderList();
-            
-            const srAnnouncement = document.getElementById('sr-announcement');
-            srAnnouncement.textContent = `태그 #${tag} 필터가 활성화되었습니다.`;
         }
 
-        // 🏷️ 해시태그 필터 해제
         function clearTagFilter() {
             selectedTag = '';
             const container = document.getElementById('active-tag-container');
             container.classList.remove('flex');
             container.classList.add('hidden');
-            
             renderList();
-            
-            const srAnnouncement = document.getElementById('sr-announcement');
-            srAnnouncement.textContent = `태그 필터가 해제되어 전체 목록이 표시됩니다.`;
             document.getElementById('search-input').focus();
         }
 
-        // 필터링 및 리스트 화면 렌더링
         function renderList() {
             const listContainer = document.getElementById('announcement-list');
             listContainer.innerHTML = '';
@@ -494,22 +458,14 @@
                     (item.tags && item.tags.some(tag => tag.toLowerCase().includes(searchQuery)))
                 );
                 const matchesTag = !selectedTag || (item.tags && item.tags.includes(selectedTag));
-
                 return matchesCategory && matchesSearch && matchesTag;
             });
 
-            const srAnnouncement = document.getElementById('sr-announcement');
-            const categoryNames = { all: "전체보기", qa: "QA", monitoring: "모니터링", general: "기타공지" };
-            let currentStatusMessage = `현재 ${categoryNames[currentCategory]} 카테고리`;
-            if(selectedTag) currentStatusMessage += `, #${selectedTag} 태그`;
-            currentStatusMessage += ` 필터링 결과 총 ${filtered.length}개의 업무 공지가 표기되어 있습니다.`;
-            srAnnouncement.textContent = currentStatusMessage;
-
             if (filtered.length === 0) {
                 listContainer.innerHTML = `
-                    <div class="text-center py-16 bg-slate-800/20 border border-dashed border-slate-800 rounded-2xl" role="status">
+                    <div class="text-center py-16 bg-white dark:bg-slate-800/20 border border-dashed border-slate-300 dark:border-slate-800 rounded-2xl" role="status">
                         <span class="text-4xl" aria-hidden="true">🤔</span>
-                        <p class="text-slate-300 mt-3 text-sm">일치하는 업무 공지사항이 없습니다.</p>
+                        <p class="text-slate-500 dark:text-slate-300 mt-3 text-sm">일치하는 업무 공지사항이 없습니다.</p>
                     </div>
                 `;
                 return;
@@ -518,37 +474,36 @@
             filtered.forEach(item => {
                 let catBadge = '';
                 if(item.category === 'qa') {
-                    catBadge = '<span class="bg-rose-500/10 text-rose-300 text-xs px-2.5 py-1 rounded-full font-semibold border border-rose-500/20"><span aria-hidden="true">🔍 </span>QA</span>';
+                    catBadge = '<span class="bg-rose-500/10 text-rose-600 dark:text-rose-300 text-xs px-2.5 py-1 rounded-full font-semibold border border-rose-500/20"><span aria-hidden="true">🔍 </span>QA</span>';
                 } else if(item.category === 'monitoring') {
-                    catBadge = '<span class="bg-cyan-500/10 text-cyan-300 text-xs px-2.5 py-1 rounded-full font-semibold border border-cyan-500/20"><span aria-hidden="true">📊 </span>모니터링</span>';
+                    catBadge = '<span class="bg-cyan-500/10 text-cyan-600 dark:text-cyan-300 text-xs px-2.5 py-1 rounded-full font-semibold border border-cyan-500/20"><span aria-hidden="true">📊 </span>모니터링</span>';
                 } else {
-                    catBadge = '<span class="bg-amber-500/10 text-amber-300 text-xs px-2.5 py-1 rounded-full font-semibold border border-amber-500/20"><span aria-hidden="true">📢 </span>기타공지</span>';
+                    catBadge = '<span class="bg-amber-500/10 text-amber-600 dark:text-amber-300 text-xs px-2.5 py-1 rounded-full font-semibold border border-amber-500/20"><span aria-hidden="true">📢 </span>기타공지</span>';
                 }
 
-                // 지정된 날짜가 없을 경우, DB 생성 날짜(created_at)를 폴백으로 사용
                 const displayDate = item.date || new Date(item.created_at).toISOString().split('T')[0];
 
                 const tagBadges = (item.tags || []).map(tag => `
-                    <button onclick="filterByTag('${tag}')" class="text-xs text-indigo-300 bg-indigo-500/5 hover:bg-indigo-500/20 border border-indigo-500/10 px-2 py-0.5 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-400" aria-label="${tag} 태그 관련 공지 모아보기">
+                    <button onclick="filterByTag('${tag}')" class="text-xs text-indigo-600 bg-indigo-50 dark:text-indigo-300 dark:bg-indigo-500/5 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 border border-indigo-200 dark:border-indigo-500/10 px-2 py-0.5 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-400" aria-label="${tag} 태그 관련 공지 모아보기">
                         #${tag}
                     </button>
                 `).join(' ');
 
                 const cardHtml = `
-                    <article class="bg-slate-800/40 border border-slate-800/80 rounded-2xl p-6 hover:border-slate-700 hover:bg-slate-800/60 focus-within:ring-2 focus-within:ring-indigo-500 transition-all duration-200" aria-labelledby="post-title-${item.id}">
+                    <article class="bg-white border border-slate-200 shadow-sm dark:bg-slate-800/40 dark:border-slate-800/80 rounded-2xl p-6 hover:border-slate-300 dark:hover:border-slate-700 transition-all duration-200" aria-labelledby="post-title-${item.id}">
                         <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                             <div>${catBadge}</div>
-                            <time class="text-xs text-slate-300" datetime="${displayDate}">${displayDate}</time>
+                            <time class="text-xs text-slate-500 dark:text-slate-300" datetime="${displayDate}">${displayDate}</time>
                         </div>
-                        <h3 id="post-title-${item.id}" class="text-lg font-semibold text-white mb-2">
-                            <a href="#" class="hover:text-indigo-400 focus:outline-none focus:underline transition-colors">${item.title}</a>
+                        <h3 id="post-title-${item.id}" class="text-lg font-semibold text-slate-900 dark:text-white mb-2">
+                            <a href="#" class="hover:text-indigo-600 dark:hover:text-indigo-400 focus:outline-none focus:underline transition-colors">${item.title}</a>
                         </h3>
-                        <div class="text-sm text-slate-300 leading-relaxed mb-4 rich-content">${item.content}</div>
-                        <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-800/85">
+                        <div class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed mb-4 rich-content">${item.content}</div>
+                        <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100 dark:border-slate-800/85">
                             <div class="flex flex-wrap gap-1.5" aria-label="관련 태그">${tagBadges}</div>
                             <div class="flex items-center gap-2">
-                                <button onclick="openEditModal(${item.id})" class="text-xs text-indigo-400 hover:text-indigo-300 hover:underline px-2.5 py-1 rounded" aria-label="'${item.title}' 공지사항 수정">수정하기</button>
-                                <button onclick="deleteAnnouncement(${item.id})" class="text-xs text-rose-400 hover:text-rose-300 hover:underline px-2.5 py-1 rounded" aria-label="'${item.title}' 공지사항 삭제">삭제하기</button>
+                                <button onclick="openEditModal(${item.id})" class="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 hover:underline px-2.5 py-1 rounded" aria-label="'${item.title}' 공지사항 수정">수정하기</button>
+                                <button onclick="deleteAnnouncement(${item.id})" class="text-xs text-rose-600 dark:text-rose-400 hover:text-rose-500 dark:hover:text-rose-300 hover:underline px-2.5 py-1 rounded" aria-label="'${item.title}' 공지사항 삭제">삭제하기</button>
                             </div>
                         </div>
                     </article>
@@ -557,7 +512,6 @@
             });
         }
 
-        // 카테고리 필터링
         function filterCategory(category) {
             currentCategory = category;
             const tabs = document.querySelectorAll('[role="tab"]');
@@ -567,18 +521,15 @@
                 tab.setAttribute('tabindex', isSelected ? '0' : '-1');
                 
                 if (isSelected) {
-                    tab.classList.remove('bg-slate-800', 'text-slate-300');
-                    tab.classList.add('bg-indigo-600', 'text-white');
+                    tab.className = "tab-btn px-4 py-2 text-xs font-semibold rounded-lg bg-indigo-600 text-white focus:outline-none transition-all";
                     document.getElementById('announcement-list').setAttribute('aria-labelledby', tab.id);
                 } else {
-                    tab.classList.remove('bg-indigo-600', 'text-white');
-                    tab.classList.add('bg-slate-800', 'text-slate-300');
+                    tab.className = "tab-btn px-4 py-2 text-xs font-semibold rounded-lg bg-slate-200 text-slate-700 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-750 focus:outline-none transition-all";
                 }
             });
             renderList();
         }
 
-        // WAI-ARIA 탭 방향키 내비게이션
         function setupKeyboardNavigation() {
             const tabList = document.querySelector('[role="tablist"]');
             const tabs = document.querySelectorAll('[role="tab"]');
@@ -600,15 +551,11 @@
             });
         }
 
-        // 🚪 등록 모드로 모달 열기
         function openAddModal() {
             triggerButton = document.activeElement;
             editingId = null; 
-
             document.getElementById('modal-title-text').textContent = "신규 업무 공지 추가";
             document.getElementById('submit-btn').textContent = "공지 등록";
-
-            // 오늘 날짜로 기본값 세팅 (YYYY-MM-DD)
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('form-date').value = today;
 
@@ -617,26 +564,21 @@
             document.getElementById('form-category').focus();
         }
 
-        // 🚪 수정 모드로 모달 열기
         function openEditModal(id) {
             triggerButton = document.activeElement; 
             editingId = id;
-
             const item = announcements.find(a => a.id === id);
             if (!item) return;
 
             document.getElementById('form-category').value = item.category;
             document.getElementById('form-title').value = item.title;
             document.getElementById('form-tags').value = (item.tags || []).join(', ');
-            
-            // 수정 시 저장된 커스텀 공지 날짜 혹은 DB 생성 날짜 복원
             const storedDate = item.date || new Date(item.created_at).toISOString().split('T')[0];
             document.getElementById('form-date').value = storedDate;
             
             if (quill) {
                 quill.root.innerHTML = item.content; 
             }
-
             document.getElementById('modal-title-text').textContent = "업무 공지 수정";
             document.getElementById('submit-btn').textContent = "수정 완료";
 
@@ -646,28 +588,16 @@
         }
 
         function closeAddModal() {
-            const modal = document.getElementById('add-modal');
-            modal.close();
+            document.getElementById('add-modal').close();
             document.getElementById('add-form').reset();
-            
-            if (quill) {
-                quill.setContents([]); 
-            }
-
+            if (quill) { quill.setContents([]); }
             editingId = null; 
-
-            if (triggerButton) {
-                triggerButton.focus();
-            }
+            if (triggerButton) { triggerButton.focus(); }
         }
 
-        // DB에 신규 공지사항 인서트 또는 업데이트 처리
         async function handleFormSubmit(e) {
             e.preventDefault();
-            if(!supabaseClient) {
-                alert("클라우드 서버 연결 오류로 글을 등록/수정할 수 없습니다.");
-                return;
-            }
+            if(!supabaseClient) return;
 
             const rawText = quill.getText().trim();
             if(rawText.length === 0) {
@@ -680,60 +610,30 @@
             submitBtn.disabled = true;
 
             const category = document.getElementById('form-category').value;
-            const date = document.getElementById('form-date').value; // 입력 날짜 추출
+            const date = document.getElementById('form-date').value; 
             const title = document.getElementById('form-title').value.trim();
             const rawTags = document.getElementById('form-tags').value;
             const tags = rawTags ? rawTags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0) : [];
 
             let resultError = null;
-
             if (editingId) {
-                submitBtn.textContent = "수정 중...";
-                const { error } = await supabaseClient
-                    .from('announcements')
-                    .update({ category, title, content, tags, date }) // 수동 지정 날짜 추가
-                    .eq('id', editingId);
+                const { error } = await supabaseClient.from('announcements').update({ category, title, content, tags, date }).eq('id', editingId);
                 resultError = error;
             } else {
-                submitBtn.textContent = "등록 중...";
-                const { error } = await supabaseClient
-                    .from('announcements')
-                    .insert([{ category, title, content, tags, date }]); // 수동 지정 날짜 추가
+                const { error } = await supabaseClient.from('announcements').insert([{ category, title, content, tags, date }]);
                 resultError = error;
             }
 
             submitBtn.disabled = false;
-            submitBtn.textContent = editingId ? "수정 완료" : "공지 등록";
-
-            if (resultError) {
-                console.error("클라우드 전송 실패:", resultError);
-                alert("전송 중 네트워크 에러가 발생했습니다.");
-                return;
-            }
-
-            const doneText = editingId ? "수정" : "등록";
+            if (resultError) { alert("네트워크 전송 오류"); return; }
             closeAddModal();
             await loadData();
-
-            const srAnnouncement = document.getElementById('sr-announcement');
-            srAnnouncement.textContent = `업무 공지 "${title}"이(가) 정상적으로 ${doneText}되었습니다.`;
         }
 
-        // DB에서 공지사항 삭제
         async function deleteAnnouncement(id) {
             if(!supabaseClient) return;
-            if(confirm("이 공지사항을 클라우드 데이터베이스에서 완전히 삭제하시겠습니까?")) {
-                const { error } = await supabaseClient
-                    .from('announcements')
-                    .delete()
-                    .eq('id', id);
-
-                if (error) {
-                    console.error("삭제 실패:", error);
-                    alert("삭제 중 오류가 발생했습니다.");
-                    return;
-                }
-
+            if(confirm("이 공지사항을 완전히 삭제하시겠습니까?")) {
+                await supabaseClient.from('announcements').delete().eq('id', id);
                 await loadData();
             }
         }
