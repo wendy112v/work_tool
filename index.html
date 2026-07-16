@@ -238,11 +238,11 @@
 
     </main>
 
-    <!-- ♿ 새 공지 등록 모달창 (Quill Wiki 에디터 탑재) -->
+    <!-- ♿ 새 공지 등록/수정 모달창 (Quill Wiki 에디터 탑재) -->
     <dialog id="add-modal" class="bg-slate-900 border border-slate-800 text-slate-100 rounded-2xl p-6 max-w-2xl w-full focus:outline-none" aria-labelledby="modal-title">
         <div class="flex justify-between items-center mb-6">
             <h2 id="modal-title" class="text-lg font-bold text-white flex items-center gap-2">
-                <span aria-hidden="true">📝</span> 신규 업무 공지 추가
+                <span aria-hidden="true">📝</span> <span id="modal-title-text">신규 업무 공지 추가</span>
             </h2>
             <button onclick="closeAddModal()" class="text-slate-400 hover:text-white text-sm p-1.5 rounded-lg hover:bg-slate-800" aria-label="공지사항 작성 창 닫기">
                 ✕
@@ -276,7 +276,7 @@
             </div>
 
             <div class="flex justify-end gap-2 pt-4 border-t border-slate-800">
-                <button type="button" onclick="closeAddModal()" class="px-4 py-2 text-sm font-semibold bg-slate-800 hover:bg-slate-755 text-slate-300 rounded-xl transition-all">취소</button>
+                <button type="button" onclick="closeAddModal()" class="px-4 py-2 text-sm font-semibold bg-slate-800 hover:bg-slate-750 text-slate-300 rounded-xl transition-all">취소</button>
                 <button id="submit-btn" type="submit" class="px-4 py-2 text-sm font-semibold bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl transition-all">공지 등록</button>
             </div>
         </form>
@@ -294,6 +294,9 @@
         let selectedTag = ''; 
         let triggerButton = null;
         let quill = null;
+        
+        // 🔄 등록/수정 모드 제어용 고유 변수
+        let editingId = null;
 
         window.onload = async () => {
             initSupabase();
@@ -318,7 +321,7 @@
             }
         }
 
-        // ✍️ Quill Rich Editor 초기화 함수
+        // ✍️ Quill Rich Editor 초기화
         function initQuillEditor() {
             quill = new Quill('#editor-container', {
                 theme: 'snow',
@@ -337,19 +340,16 @@
                 }
             });
 
-            // ♿ 스크린 리더용 ARIA 속성 주입
             const quillEditor = document.querySelector('#editor-container .ql-editor');
             if (quillEditor) {
                 quillEditor.setAttribute('aria-labelledby', 'editor-label');
             }
 
-            // 🏷️ 툴바 툴팁 & 단축키 자동 매핑 추가
             addToolbarTooltips();
         }
 
-        // 🏷️ 마우스 호버 시 강조, 기울임, 밑줄 한글 명칭 및 단축키 툴팁 표기 로직
+        // 🏷️ 툴바 툴팁 & 단축키 자동 매핑
         function addToolbarTooltips() {
-            // 사용자 OS 환경 감지 (Mac vs Windows)
             const isMac = /Mac|iPod|iPhone|iPad/.test(navigator.userAgent);
             const mod = isMac ? '⌘' : 'Ctrl';
 
@@ -374,9 +374,7 @@
             for (const selector in tooltipMapping) {
                 const elements = document.querySelectorAll(`.ql-toolbar ${selector}`);
                 elements.forEach(el => {
-                    // 마우스 호버 시 툴팁(title) 추가
                     el.setAttribute('title', tooltipMapping[selector]);
-                    // ♿ 스크린 리더 가독성을 위한 aria-label 동시 추가
                     el.setAttribute('aria-label', tooltipMapping[selector]);
                 });
             }
@@ -411,11 +409,9 @@
             renderList();
         }
 
-        // 🏷️ 특정 해시태그 클릭 시 작동하는 필터링 함수
+        // 🏷️ 특정 해시태그 클릭 필터
         function filterByTag(tag) {
             selectedTag = tag;
-            
-            // 태그 필터 바 노출 제어
             const container = document.getElementById('active-tag-container');
             const textSpan = document.getElementById('active-tag-text');
             textSpan.textContent = `필터링된 태그: #${tag}`;
@@ -424,7 +420,6 @@
 
             renderList();
             
-            // 스크린 리더용 안내 발송
             const srAnnouncement = document.getElementById('sr-announcement');
             srAnnouncement.textContent = `태그 #${tag} 필터가 활성화되었습니다.`;
         }
@@ -440,8 +435,6 @@
             
             const srAnnouncement = document.getElementById('sr-announcement');
             srAnnouncement.textContent = `태그 필터가 해제되어 전체 목록이 표시됩니다.`;
-
-            // ♿ 초점 유실 방지: 필터 제거 후 검색 인풋으로 즉시 포커스 유도
             document.getElementById('search-input').focus();
         }
 
@@ -462,7 +455,6 @@
                 return matchesCategory && matchesSearch && matchesTag;
             });
 
-            // ARIA Live region 정보 갱신
             const srAnnouncement = document.getElementById('sr-announcement');
             const categoryNames = { all: "전체보기", qa: "QA", monitoring: "모니터링", general: "기타공지" };
             let currentStatusMessage = `현재 ${categoryNames[currentCategory]} 카테고리`;
@@ -492,7 +484,6 @@
 
                 const formattedDate = new Date(item.created_at || item.date).toISOString().split('T')[0];
 
-                // ♿ 태그 버튼 명세화
                 const tagBadges = (item.tags || []).map(tag => `
                     <button onclick="filterByTag('${tag}')" class="text-xs text-indigo-300 bg-indigo-500/5 hover:bg-indigo-500/20 border border-indigo-500/10 px-2 py-0.5 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-400" aria-label="${tag} 태그 관련 공지 모아보기">
                         #${tag}
@@ -511,7 +502,11 @@
                         <div class="text-sm text-slate-300 leading-relaxed mb-4 rich-content">${item.content}</div>
                         <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-800/85">
                             <div class="flex flex-wrap gap-1.5" aria-label="관련 태그">${tagBadges}</div>
-                            <button onclick="deleteAnnouncement(${item.id})" class="text-xs text-rose-400 hover:text-rose-300 hover:underline px-2.5 py-1 rounded" aria-label="'${item.title}' 공지사항 삭제">삭제하기</button>
+                            <div class="flex items-center gap-2">
+                                <!-- ♿ 수정 및 삭제 버튼 접근성 레이블 지정 -->
+                                <button onclick="openEditModal(${item.id})" class="text-xs text-indigo-400 hover:text-indigo-300 hover:underline px-2.5 py-1 rounded" aria-label="'${item.title}' 공지사항 수정">수정하기</button>
+                                <button onclick="deleteAnnouncement(${item.id})" class="text-xs text-rose-400 hover:text-rose-300 hover:underline px-2.5 py-1 rounded" aria-label="'${item.title}' 공지사항 삭제">삭제하기</button>
+                            </div>
                         </div>
                     </article>
                 `;
@@ -562,9 +557,42 @@
             });
         }
 
-        // 모달 제어
+        // 🚪 등록 모드로 모달 열기
         function openAddModal() {
             triggerButton = document.activeElement;
+            editingId = null; // 수정 플래그 리셋
+
+            // 모달 레이블 원복
+            document.getElementById('modal-title-text').textContent = "신규 업무 공지 추가";
+            document.getElementById('submit-btn').textContent = "공지 등록";
+
+            const modal = document.getElementById('add-modal');
+            modal.showModal();
+            document.getElementById('form-category').focus();
+        }
+
+        // 🚪 수정 모드로 모달 열기
+        function openEditModal(id) {
+            triggerButton = document.activeElement; // 초점 유실 대비 트리거 요소 기록
+            editingId = id;
+
+            // 로컬 메모리에서 해당 데이터 서치
+            const item = announcements.find(a => a.id === id);
+            if (!item) return;
+
+            // 값 세팅
+            document.getElementById('form-category').value = item.category;
+            document.getElementById('form-title').value = item.title;
+            document.getElementById('form-tags').value = (item.tags || []).join(', ');
+            
+            if (quill) {
+                quill.root.innerHTML = item.content; // 에디터 마크업 통째로 대입
+            }
+
+            // 모달 레이블 수정 변경
+            document.getElementById('modal-title-text').textContent = "업무 공지 수정";
+            document.getElementById('submit-btn').textContent = "수정 완료";
+
             const modal = document.getElementById('add-modal');
             modal.showModal();
             document.getElementById('form-category').focus();
@@ -579,16 +607,18 @@
                 quill.setContents([]); 
             }
 
+            editingId = null; // 플래그 초기화
+
             if (triggerButton) {
                 triggerButton.focus();
             }
         }
 
-        // DB에 신규 공지사항 인서트
+        // DB에 신규 공지사항 인서트 또는 업데이트 처리
         async function handleFormSubmit(e) {
             e.preventDefault();
             if(!supabaseClient) {
-                alert("클라우드 서버 연결 오류로 글을 등록할 수 없습니다.");
+                alert("클라우드 서버 연결 오류로 글을 등록/수정할 수 없습니다.");
                 return;
             }
 
@@ -599,31 +629,48 @@
             }
 
             const content = quill.root.innerHTML;
-
             const submitBtn = document.getElementById('submit-btn');
             submitBtn.disabled = true;
-            submitBtn.textContent = "등록 중...";
 
             const category = document.getElementById('form-category').value;
             const title = document.getElementById('form-title').value.trim();
             const rawTags = document.getElementById('form-tags').value;
             const tags = rawTags ? rawTags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0) : [];
 
-            const { error } = await supabaseClient
-                .from('announcements')
-                .insert([{ category, title, content, tags }]);
+            let resultError = null;
+
+            if (editingId) {
+                // 🔄 수정 모드 (Update)
+                submitBtn.textContent = "수정 중...";
+                const { error } = await supabaseClient
+                    .from('announcements')
+                    .update({ category, title, content, tags })
+                    .eq('id', editingId);
+                resultError = error;
+            } else {
+                // ➕ 등록 모드 (Insert)
+                submitBtn.textContent = "등록 중...";
+                const { error } = await supabaseClient
+                    .from('announcements')
+                    .insert([{ category, title, content, tags }]);
+                resultError = error;
+            }
 
             submitBtn.disabled = false;
-            submitBtn.textContent = "공지 등록";
+            submitBtn.textContent = editingId ? "수정 완료" : "공지 등록";
 
-            if (error) {
-                console.error("인서트 중 에러 발생:", error);
-                alert("등록하는 동안 오류가 발생했습니다.");
+            if (resultError) {
+                console.error("클라우드 전송 실패:", resultError);
+                alert("전송 중 네트워크 에러가 발생했습니다.");
                 return;
             }
 
+            const doneText = editingId ? "수정" : "등록";
             closeAddModal();
             await loadData();
+
+            const srAnnouncement = document.getElementById('sr-announcement');
+            srAnnouncement.textContent = `업무 공지 "${title}"이(가) 정상적으로 ${doneText}되었습니다.`;
         }
 
         // DB에서 공지사항 삭제
