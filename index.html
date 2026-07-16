@@ -276,7 +276,7 @@
             </div>
 
             <div class="flex justify-end gap-2 pt-4 border-t border-slate-800">
-                <button type="button" onclick="closeAddModal()" class="px-4 py-2 text-sm font-semibold bg-slate-800 hover:bg-slate-750 text-slate-300 rounded-xl transition-all">취소</button>
+                <button type="button" onclick="closeAddModal()" class="px-4 py-2 text-sm font-semibold bg-slate-800 hover:bg-slate-755 text-slate-300 rounded-xl transition-all">취소</button>
                 <button id="submit-btn" type="submit" class="px-4 py-2 text-sm font-semibold bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl transition-all">공지 등록</button>
             </div>
         </form>
@@ -318,21 +318,21 @@
             }
         }
 
-        // ✍️ Quill Rich Editor 초기화 함수 (위키 풀스펙 툴바 변경)
+        // ✍️ Quill Rich Editor 초기화 함수
         function initQuillEditor() {
             quill = new Quill('#editor-container', {
                 theme: 'snow',
                 placeholder: '업무 관련 지침, 예시 코드, 리스트 등을 활용하여 상세한 위키 가이드라인을 남겨보세요...',
                 modules: {
                     toolbar: [
-                        [{ 'header': [1, 2, 3, false] }],                     // 제목 계층화 (H1, H2, H3, 일반 텍스트)
-                        ['bold', 'italic', 'underline', 'strike'],             // 기본 폰트 효과
-                        [{ 'color': [] }, { 'background': [] }],               // 글자 및 배경 색상 변경
-                        ['blockquote', 'code-block'],                          // 위키용 인용구, 소스 코드 영역
-                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],         // 리스트 스타일링
-                        ['link', 'image'],                                     // 지라 하이퍼링크 및 레퍼런스 스크린샷 이미지
-                        [{ 'align': [] }],                                     // 본문 영역 정렬
-                        ['clean']                                              // 포맷 초기화
+                        [{ 'header': [1, 2, 3, false] }],                     
+                        ['bold', 'italic', 'underline', 'strike'],             
+                        [{ 'color': [] }, { 'background': [] }],               
+                        ['blockquote', 'code-block'],                          
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],         
+                        ['link', 'image'],                                     
+                        [{ 'align': [] }],                                     
+                        ['clean']                                              
                     ]
                 }
             });
@@ -341,6 +341,44 @@
             const quillEditor = document.querySelector('#editor-container .ql-editor');
             if (quillEditor) {
                 quillEditor.setAttribute('aria-labelledby', 'editor-label');
+            }
+
+            // 🏷️ 툴바 툴팁 & 단축키 자동 매핑 추가
+            addToolbarTooltips();
+        }
+
+        // 🏷️ 마우스 호버 시 강조, 기울임, 밑줄 한글 명칭 및 단축키 툴팁 표기 로직
+        function addToolbarTooltips() {
+            // 사용자 OS 환경 감지 (Mac vs Windows)
+            const isMac = /Mac|iPod|iPhone|iPad/.test(navigator.userAgent);
+            const mod = isMac ? '⌘' : 'Ctrl';
+
+            const tooltipMapping = {
+                '.ql-bold': `강조 (${mod} + B)`,
+                '.ql-italic': `기울임 (${mod} + I)`,
+                '.ql-underline': `밑줄 (${mod} + U)`,
+                '.ql-strike': '취소선',
+                '.ql-blockquote': '인용구',
+                '.ql-code-block': '코드 블록',
+                '.ql-list[value="ordered"]': '번호 리스트',
+                '.ql-list[value="bullet"]': '불릿 리스트',
+                '.ql-link': `링크 삽입 (${mod} + K)`,
+                '.ql-image': '이미지 삽입',
+                '.ql-clean': '서식 지우기',
+                '.ql-header': '제목 크기 설정',
+                '.ql-color': '글자 색상',
+                '.ql-background': '글자 배경색',
+                '.ql-align': '정렬'
+            };
+
+            for (const selector in tooltipMapping) {
+                const elements = document.querySelectorAll(`.ql-toolbar ${selector}`);
+                elements.forEach(el => {
+                    // 마우스 호버 시 툴팁(title) 추가
+                    el.setAttribute('title', tooltipMapping[selector]);
+                    // ♿ 스크린 리더 가독성을 위한 aria-label 동시 추가
+                    el.setAttribute('aria-label', tooltipMapping[selector]);
+                });
             }
         }
 
