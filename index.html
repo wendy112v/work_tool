@@ -24,7 +24,7 @@
             backdrop-filter: blur(4px);
         }
 
-        /* 🎨 Quill 에디터 다크모드 커스텀 스타일 정의 */
+        /* 🎨 Quill 에디터 다크모드 위키 테마 커스텀 */
         .ql-toolbar.ql-snow {
             border-color: #334155 !important; /* slate-700 */
             background-color: #0f172a !important; /* slate-900 */
@@ -40,7 +40,7 @@
             color: #e2e8f0 !important; /* slate-200 */
         }
         .ql-editor {
-            min-height: 200px;
+            min-height: 250px;
             font-size: 0.875rem; /* text-sm */
         }
         /* 에디터 툴바 버튼 아이콘 색상 보정 */
@@ -74,7 +74,28 @@
             fill: #818cf8 !important;
         }
 
-        /* 📋 저장된 에디터 서식이 카드 내부에서 정상 렌더링되도록 오버라이딩 */
+        /* 📋 위키 콘텐츠 카드 내부 렌더링 스타일 규격화 */
+        .rich-content h1 {
+            font-size: 1.5rem !important;
+            font-weight: 700 !important;
+            margin-top: 1.25rem !important;
+            margin-bottom: 0.5rem !important;
+            color: #ffffff !important;
+        }
+        .rich-content h2 {
+            font-size: 1.25rem !important;
+            font-weight: 600 !important;
+            margin-top: 1rem !important;
+            margin-bottom: 0.5rem !important;
+            color: #f1f5f9 !important;
+        }
+        .rich-content h3 {
+            font-size: 1.125rem !important;
+            font-weight: 650 !important;
+            margin-top: 0.875rem !important;
+            margin-bottom: 0.5rem !important;
+            color: #e2e8f0 !important;
+        }
         .rich-content ul {
             list-style-type: disc !important;
             margin-left: 1.5rem !important;
@@ -92,6 +113,47 @@
         }
         .rich-content em {
             font-style: italic !important;
+        }
+        .rich-content blockquote {
+            border-left: 4px solid #6366f1 !important; /* indigo-500 */
+            padding-left: 1rem !important;
+            margin: 0.75rem 0 !important;
+            color: #94a3b8 !important; /* slate-400 */
+            font-style: italic !important;
+            background-color: rgba(99, 102, 241, 0.05);
+            padding-top: 0.25rem;
+            padding-bottom: 0.25rem;
+            border-radius: 0 0.375rem 0.375rem 0;
+        }
+        .rich-content pre {
+            background-color: #020617 !important; /* slate-950 */
+            border: 1px solid #334155 !important; /* slate-700 */
+            padding: 0.75rem !important;
+            border-radius: 0.5rem !important;
+            font-family: monospace !important;
+            margin: 0.75rem 0 !important;
+            overflow-x: auto !important;
+            color: #cbd5e1 !important;
+        }
+        .rich-content code {
+            background-color: #0f172a !important; /* slate-900 */
+            padding: 0.2rem 0.4rem !important;
+            border-radius: 0.25rem !important;
+            font-family: monospace !important;
+            color: #f43f5e !important; /* rose-500 */
+        }
+        .rich-content a {
+            color: #818cf8 !important; /* indigo-400 */
+            text-decoration: underline !important;
+        }
+        .rich-content a:hover {
+            color: #a5b4fc !important; /* indigo-300 */
+        }
+        .rich-content img {
+            max-width: 100% !important;
+            height: auto !important;
+            border-radius: 0.5rem !important;
+            margin: 0.75rem 0 !important;
         }
         .rich-content p {
             margin-bottom: 0.5rem !important;
@@ -114,7 +176,7 @@
                     <h1 class="text-xl font-bold tracking-tight text-white">접근성팀 공지사항 정리</h1>
                 </div>
             </div>
-            <!-- 실시간 상태 표시등 (스크린 리더 실시간 안내 적용) -->
+            <!-- 실시간 상태 표시등 -->
             <div class="flex items-center gap-2 text-xs bg-slate-800 px-3 py-1.5 rounded-full text-slate-200" aria-live="polite">
                 <span id="db-status-dot" class="w-2 h-2 rounded-full bg-amber-500 animate-pulse" aria-hidden="true"></span>
                 <span id="db-status-text">데이터베이스 연결 상태 확인 중...</span>
@@ -176,8 +238,8 @@
 
     </main>
 
-    <!-- ♿ 새 공지 등록 모달창 (카테고리: QA, 모니터링, 기타공지 & Rich Editor 탑재) -->
-    <dialog id="add-modal" class="bg-slate-900 border border-slate-800 text-slate-100 rounded-2xl p-6 max-w-xl w-full focus:outline-none" aria-labelledby="modal-title">
+    <!-- ♿ 새 공지 등록 모달창 (Quill Wiki 에디터 탑재) -->
+    <dialog id="add-modal" class="bg-slate-900 border border-slate-800 text-slate-100 rounded-2xl p-6 max-w-2xl w-full focus:outline-none" aria-labelledby="modal-title">
         <div class="flex justify-between items-center mb-6">
             <h2 id="modal-title" class="text-lg font-bold text-white flex items-center gap-2">
                 <span aria-hidden="true">📝</span> 신규 업무 공지 추가
@@ -207,7 +269,7 @@
                 <input type="text" id="form-tags" placeholder="QA, 모니터링, 지침" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
             </div>
 
-            <!-- ✍️ Quill.js 에디터 컨테이너 장착 -->
+            <!-- ✍️ Quill.js Wiki 에디터 적용 -->
             <div>
                 <div id="editor-label" class="block text-xs font-semibold text-slate-300 mb-1.5">공지 상세 내용 *</div>
                 <div id="editor-container"></div>
@@ -229,9 +291,9 @@
         let announcements = [];
         let currentCategory = 'all';
         let searchQuery = '';
-        let selectedTag = ''; // 🏷️ 해시태그 필터링 상태
+        let selectedTag = ''; 
         let triggerButton = null;
-        let quill = null; // ✍️ 에디터 객체 변수
+        let quill = null;
 
         window.onload = async () => {
             initSupabase();
@@ -256,16 +318,20 @@
             }
         }
 
-        // ✍️ Quill Rich Editor 초기화 함수
+        // ✍️ Quill Rich Editor 초기화 함수 (위키 풀스펙 툴바 변경)
         function initQuillEditor() {
             quill = new Quill('#editor-container', {
                 theme: 'snow',
-                placeholder: '회의 도중 공유된 구체적인 실행 절차나 볼드, 리스트 서식 등을 사용해 상세히 기록해 보세요...',
+                placeholder: '업무 관련 지침, 예시 코드, 리스트 등을 활용하여 상세한 위키 가이드라인을 남겨보세요...',
                 modules: {
                     toolbar: [
-                        ['bold', 'italic', 'underline', 'strike'],             // 텍스트 기본 스타일링
-                        [{ 'color': [] }, { 'background': [] }],               // 글자 색상, 글자 배경색 커스텀
-                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],         // 넘버링, 불릿 리스트
+                        [{ 'header': [1, 2, 3, false] }],                     // 제목 계층화 (H1, H2, H3, 일반 텍스트)
+                        ['bold', 'italic', 'underline', 'strike'],             // 기본 폰트 효과
+                        [{ 'color': [] }, { 'background': [] }],               // 글자 및 배경 색상 변경
+                        ['blockquote', 'code-block'],                          // 위키용 인용구, 소스 코드 영역
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],         // 리스트 스타일링
+                        ['link', 'image'],                                     // 지라 하이퍼링크 및 레퍼런스 스크린샷 이미지
+                        [{ 'align': [] }],                                     // 본문 영역 정렬
                         ['clean']                                              // 포맷 초기화
                     ]
                 }
@@ -283,7 +349,7 @@
             const label = document.getElementById("db-status-text");
             label.textContent = text;
             if(isSuccess) {
-                dot.className = "w-2 h-2 rounded-full bg-emerald-500"; // 연결 완료 시 animate-pulse 제거
+                dot.className = "w-2 h-2 rounded-full bg-emerald-500"; 
             } else {
                 dot.className = "w-2 h-2 rounded-full bg-rose-500 animate-pulse";
             }
@@ -325,7 +391,7 @@
             srAnnouncement.textContent = `태그 #${tag} 필터가 활성화되었습니다.`;
         }
 
-        // 🏷️ 해시태그 필터 해제 (초점 복원 로직 추가)
+        // 🏷️ 해시태그 필터 해제
         function clearTagFilter() {
             selectedTag = '';
             const container = document.getElementById('active-tag-container');
@@ -388,14 +454,13 @@
 
                 const formattedDate = new Date(item.created_at || item.date).toISOString().split('T')[0];
 
-                // ♿ 태그 버튼 명세화 (aria-label 구체화)
+                // ♿ 태그 버튼 명세화
                 const tagBadges = (item.tags || []).map(tag => `
                     <button onclick="filterByTag('${tag}')" class="text-xs text-indigo-300 bg-indigo-500/5 hover:bg-indigo-500/20 border border-indigo-500/10 px-2 py-0.5 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-400" aria-label="${tag} 태그 관련 공지 모아보기">
                         #${tag}
                     </button>
                 `).join(' ');
 
-                // 📝 item.content에는 이제 풍부한 HTML 마크업이 직접 담기므로 그대로 출력 (rich-content 스타일 적용)
                 const cardHtml = `
                     <article class="bg-slate-800/40 border border-slate-800/80 rounded-2xl p-6 hover:border-slate-700 hover:bg-slate-800/60 focus-within:ring-2 focus-within:ring-indigo-500 transition-all duration-200" aria-labelledby="post-title-${item.id}">
                         <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
@@ -472,7 +537,6 @@
             modal.close();
             document.getElementById('add-form').reset();
             
-            // ✍️ 모달 닫을 때 에디터 초기화
             if (quill) {
                 quill.setContents([]); 
             }
@@ -490,14 +554,12 @@
                 return;
             }
 
-            // ✍️ Quill 에디터의 순수 텍스트 길이 측정 후 검증
             const rawText = quill.getText().trim();
             if(rawText.length === 0) {
                 alert("공지 상세 내용을 입력해 주세요.");
                 return;
             }
 
-            // ✍️ 에디터 내부의 HTML 소스 코드 그대로 추출
             const content = quill.root.innerHTML;
 
             const submitBtn = document.getElementById('submit-btn');
