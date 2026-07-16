@@ -74,7 +74,7 @@
             fill: #818cf8 !important;
         }
 
-        /* 📋 위키 콘텐츠 카드 내부 렌더링 스타일 규격화 */
+        /* 📋 타 위키(노션, 콘플루언스 등) 복사-붙여넣기 시 본문 레이아웃 스타일 보존 정의 */
         .rich-content h1 {
             font-size: 1.5rem !important;
             font-weight: 700 !important;
@@ -107,6 +107,9 @@
             margin-left: 1.5rem !important;
             margin-top: 0.5rem !important;
             margin-bottom: 0.5rem !important;
+        }
+        .rich-content li {
+            margin-bottom: 0.25rem !important;
         }
         .rich-content strong {
             font-weight: 700 !important;
@@ -157,6 +160,39 @@
         }
         .rich-content p {
             margin-bottom: 0.5rem !important;
+        }
+
+        /* 📋 위키에서 흔히 가져오는 표(Table) 다크모드 대응 초정밀 CSS */
+        .rich-content table {
+            border-collapse: collapse !important;
+            width: 100% !important;
+            margin: 1.25rem 0 !important;
+            font-size: 0.875rem !important;
+            border-radius: 0.5rem !important;
+            overflow: hidden !important;
+            border: 1px solid #334155 !important; /* slate-700 */
+        }
+        .rich-content th, .rich-content td {
+            border: 1px solid #334155 !important;
+            padding: 0.625rem 0.875rem !important;
+            text-align: left !important;
+        }
+        .rich-content th {
+            background-color: #0f172a !important; /* slate-900 */
+            font-weight: 600 !important;
+            color: #ffffff !important;
+        }
+        .rich-content tr:nth-child(even) {
+            background-color: rgba(255, 255, 255, 0.02) !important;
+        }
+
+        /* 📋 체크박스(할 일 목록) 대응 커스텀 */
+        .rich-content input[type="checkbox"] {
+            margin-right: 0.5rem !important;
+            accent-color: #6366f1 !important; /* indigo-500 */
+            pointer-events: none !important; /* 본문 카드 안에서는 마우스 클릭 오동작 방지 */
+            transform: scale(1.1) !important;
+            vertical-align: middle !important;
         }
     </style>
 </head>
@@ -294,9 +330,7 @@
         let selectedTag = ''; 
         let triggerButton = null;
         let quill = null;
-        
-        // 🔄 등록/수정 모드 제어용 고유 변수
-        let editingId = null;
+        let editingId = null; 
 
         window.onload = async () => {
             initSupabase();
@@ -325,7 +359,7 @@
         function initQuillEditor() {
             quill = new Quill('#editor-container', {
                 theme: 'snow',
-                placeholder: '업무 관련 지침, 예시 코드, 리스트 등을 활용하여 상세한 위키 가이드라인을 남겨보세요...',
+                placeholder: '다른 위키나 문서에서 복사한 내용을 그대로 붙여넣거나(Ctrl+V), 서식을 활용해 새로운 지침을 작성해 보세요...',
                 modules: {
                     toolbar: [
                         [{ 'header': [1, 2, 3, false] }],                     
@@ -503,7 +537,6 @@
                         <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-800/85">
                             <div class="flex flex-wrap gap-1.5" aria-label="관련 태그">${tagBadges}</div>
                             <div class="flex items-center gap-2">
-                                <!-- ♿ 수정 및 삭제 버튼 접근성 레이블 지정 -->
                                 <button onclick="openEditModal(${item.id})" class="text-xs text-indigo-400 hover:text-indigo-300 hover:underline px-2.5 py-1 rounded" aria-label="'${item.title}' 공지사항 수정">수정하기</button>
                                 <button onclick="deleteAnnouncement(${item.id})" class="text-xs text-rose-400 hover:text-rose-300 hover:underline px-2.5 py-1 rounded" aria-label="'${item.title}' 공지사항 삭제">삭제하기</button>
                             </div>
@@ -560,9 +593,8 @@
         // 🚪 등록 모드로 모달 열기
         function openAddModal() {
             triggerButton = document.activeElement;
-            editingId = null; // 수정 플래그 리셋
+            editingId = null; 
 
-            // 모달 레이블 원복
             document.getElementById('modal-title-text').textContent = "신규 업무 공지 추가";
             document.getElementById('submit-btn').textContent = "공지 등록";
 
@@ -573,23 +605,20 @@
 
         // 🚪 수정 모드로 모달 열기
         function openEditModal(id) {
-            triggerButton = document.activeElement; // 초점 유실 대비 트리거 요소 기록
+            triggerButton = document.activeElement; 
             editingId = id;
 
-            // 로컬 메모리에서 해당 데이터 서치
             const item = announcements.find(a => a.id === id);
             if (!item) return;
 
-            // 값 세팅
             document.getElementById('form-category').value = item.category;
             document.getElementById('form-title').value = item.title;
             document.getElementById('form-tags').value = (item.tags || []).join(', ');
             
             if (quill) {
-                quill.root.innerHTML = item.content; // 에디터 마크업 통째로 대입
+                quill.root.innerHTML = item.content; 
             }
 
-            // 모달 레이블 수정 변경
             document.getElementById('modal-title-text').textContent = "업무 공지 수정";
             document.getElementById('submit-btn').textContent = "수정 완료";
 
@@ -607,7 +636,7 @@
                 quill.setContents([]); 
             }
 
-            editingId = null; // 플래그 초기화
+            editingId = null; 
 
             if (triggerButton) {
                 triggerButton.focus();
@@ -640,7 +669,6 @@
             let resultError = null;
 
             if (editingId) {
-                // 🔄 수정 모드 (Update)
                 submitBtn.textContent = "수정 중...";
                 const { error } = await supabaseClient
                     .from('announcements')
@@ -648,7 +676,6 @@
                     .eq('id', editingId);
                 resultError = error;
             } else {
-                // ➕ 등록 모드 (Insert)
                 submitBtn.textContent = "등록 중...";
                 const { error } = await supabaseClient
                     .from('announcements')
