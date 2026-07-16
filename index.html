@@ -74,7 +74,7 @@
             fill: #818cf8 !important;
         }
 
-        /* 📋 타 위키(노션, 콘플루언스 등) 복사-붙여넣기 시 본문 레이아웃 스타일 보존 정의 */
+        /* 📋 위키 콘텐츠 카드 내부 렌더링 스타일 규격화 */
         .rich-content h1 {
             font-size: 1.5rem !important;
             font-weight: 700 !important;
@@ -162,7 +162,7 @@
             margin-bottom: 0.5rem !important;
         }
 
-        /* 📋 위키에서 흔히 가져오는 표(Table) 다크모드 대응 초정밀 CSS */
+        /* 📋 표(Table) 다크모드 대응 초정밀 CSS */
         .rich-content table {
             border-collapse: collapse !important;
             width: 100% !important;
@@ -190,7 +190,7 @@
         .rich-content input[type="checkbox"] {
             margin-right: 0.5rem !important;
             accent-color: #6366f1 !important; /* indigo-500 */
-            pointer-events: none !important; /* 본문 카드 안에서는 마우스 클릭 오동작 방지 */
+            pointer-events: none !important;
             transform: scale(1.1) !important;
             vertical-align: middle !important;
         }
@@ -274,7 +274,7 @@
 
     </main>
 
-    <!-- ♿ 새 공지 등록/수정 모달창 (Quill Wiki 에디터 탑재) -->
+    <!-- ♿ 새 공지 등록/수정 모달창 (공지 날짜 지정 기능 추가) -->
     <dialog id="add-modal" class="bg-slate-900 border border-slate-800 text-slate-100 rounded-2xl p-6 max-w-2xl w-full focus:outline-none" aria-labelledby="modal-title">
         <div class="flex justify-between items-center mb-6">
             <h2 id="modal-title" class="text-lg font-bold text-white flex items-center gap-2">
@@ -286,13 +286,21 @@
         </div>
         
         <form id="add-form" class="space-y-4" onsubmit="handleFormSubmit(event)">
-            <div>
-                <label for="form-category" class="block text-xs font-semibold text-slate-300 mb-1.5">카테고리 분류 *</label>
-                <select id="form-category" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <option value="qa">🔍 QA</option>
-                    <option value="monitoring">📊 모니터링</option>
-                    <option value="general">📢 기타공지</option>
-                </select>
+            <!-- 분류 및 날짜 묶음 영역 -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label for="form-category" class="block text-xs font-semibold text-slate-300 mb-1.5">카테고리 분류 *</label>
+                    <select id="form-category" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="qa">🔍 QA</option>
+                        <option value="monitoring">📊 모니터링</option>
+                        <option value="general">📢 기타공지</option>
+                    </select>
+                </div>
+                <div>
+                    <!-- 📅 수동 공지 날짜 지정 기능 추가 -->
+                    <label for="form-date" class="block text-xs font-semibold text-slate-300 mb-1.5">공지 날짜 *</label>
+                    <input type="date" id="form-date" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
             </div>
 
             <div>
@@ -431,6 +439,7 @@
             const { data, error } = await supabaseClient
                 .from('announcements')
                 .select('*')
+                .order('date', { ascending: false }) // 공지 등록 날짜 순으로 정렬 변경
                 .order('created_at', { ascending: false });
 
             if (error) {
@@ -516,7 +525,8 @@
                     catBadge = '<span class="bg-amber-500/10 text-amber-300 text-xs px-2.5 py-1 rounded-full font-semibold border border-amber-500/20"><span aria-hidden="true">📢 </span>기타공지</span>';
                 }
 
-                const formattedDate = new Date(item.created_at || item.date).toISOString().split('T')[0];
+                // 지정된 날짜가 없을 경우, DB 생성 날짜(created_at)를 폴백으로 사용
+                const displayDate = item.date || new Date(item.created_at).toISOString().split('T')[0];
 
                 const tagBadges = (item.tags || []).map(tag => `
                     <button onclick="filterByTag('${tag}')" class="text-xs text-indigo-300 bg-indigo-500/5 hover:bg-indigo-500/20 border border-indigo-500/10 px-2 py-0.5 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-400" aria-label="${tag} 태그 관련 공지 모아보기">
@@ -528,7 +538,7 @@
                     <article class="bg-slate-800/40 border border-slate-800/80 rounded-2xl p-6 hover:border-slate-700 hover:bg-slate-800/60 focus-within:ring-2 focus-within:ring-indigo-500 transition-all duration-200" aria-labelledby="post-title-${item.id}">
                         <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                             <div>${catBadge}</div>
-                            <time class="text-xs text-slate-300" datetime="${formattedDate}">${formattedDate}</time>
+                            <time class="text-xs text-slate-300" datetime="${displayDate}">${displayDate}</time>
                         </div>
                         <h3 id="post-title-${item.id}" class="text-lg font-semibold text-white mb-2">
                             <a href="#" class="hover:text-indigo-400 focus:outline-none focus:underline transition-colors">${item.title}</a>
@@ -598,6 +608,10 @@
             document.getElementById('modal-title-text').textContent = "신규 업무 공지 추가";
             document.getElementById('submit-btn').textContent = "공지 등록";
 
+            // 오늘 날짜로 기본값 세팅 (YYYY-MM-DD)
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('form-date').value = today;
+
             const modal = document.getElementById('add-modal');
             modal.showModal();
             document.getElementById('form-category').focus();
@@ -614,6 +628,10 @@
             document.getElementById('form-category').value = item.category;
             document.getElementById('form-title').value = item.title;
             document.getElementById('form-tags').value = (item.tags || []).join(', ');
+            
+            // 수정 시 저장된 커스텀 공지 날짜 혹은 DB 생성 날짜 복원
+            const storedDate = item.date || new Date(item.created_at).toISOString().split('T')[0];
+            document.getElementById('form-date').value = storedDate;
             
             if (quill) {
                 quill.root.innerHTML = item.content; 
@@ -662,6 +680,7 @@
             submitBtn.disabled = true;
 
             const category = document.getElementById('form-category').value;
+            const date = document.getElementById('form-date').value; // 입력 날짜 추출
             const title = document.getElementById('form-title').value.trim();
             const rawTags = document.getElementById('form-tags').value;
             const tags = rawTags ? rawTags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0) : [];
@@ -672,14 +691,14 @@
                 submitBtn.textContent = "수정 중...";
                 const { error } = await supabaseClient
                     .from('announcements')
-                    .update({ category, title, content, tags })
+                    .update({ category, title, content, tags, date }) // 수동 지정 날짜 추가
                     .eq('id', editingId);
                 resultError = error;
             } else {
                 submitBtn.textContent = "등록 중...";
                 const { error } = await supabaseClient
                     .from('announcements')
-                    .insert([{ category, title, content, tags }]);
+                    .insert([{ category, title, content, tags, date }]); // 수동 지정 날짜 추가
                 resultError = error;
             }
 
