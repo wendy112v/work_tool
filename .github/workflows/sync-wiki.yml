@@ -1,0 +1,32 @@
+name: Sync GitHub Wiki to Supabase
+
+on:
+  gollum: # 🚀 깃허브 위키가 업데이트될 때 자동 실행
+  workflow_dispatch: # 수동 실행 버튼 활성화
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 1. 포탈 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: 2. 깃허브 위키 리포지토리 체크아웃
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository }}.wiki # 해당 레포의 위키 가져오기
+          path: wiki-repo
+
+      - name: 3. Node.js 환경 세팅
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: 4. 의존성 패키지 설치
+        run: npm install
+
+      - name: 5. Supabase 동기화 스크립트 실행
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: node scripts/sync-wiki.js
