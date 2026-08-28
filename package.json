@@ -1,0 +1,9 @@
+{
+  "name": "wiki-sync",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.40.0",
+    "marked": "^12.0.0"
+  }
+}
