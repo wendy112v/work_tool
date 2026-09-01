@@ -10,7 +10,6 @@
         body { background-color: #f5f6f8; margin: 0; padding: 20px; color: #333; }
         .container { max-width: 900px; margin: 0 auto; position: relative; }
         
-        /* 상단 헤더 & 로그아웃 버튼 */
         header { text-align: center; margin-bottom: 25px; position: relative; }
         h1 { margin-bottom: 15px; color: #1e1e1e; font-size: 24px; }
         .logout-btn { position: absolute; right: 0; top: 10px; background: none; border: none; color: #888; text-decoration: underline; cursor: pointer; font-size: 13px; display: none; }
@@ -18,7 +17,6 @@
         
         .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
 
-        /* 구글 로그인 모달 */
         .auth-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; }
         .auth-modal { background: white; padding: 40px 30px; border-radius: 16px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         .auth-modal h2 { margin-top: 0; font-size: 22px; color: #1e1e1e; margin-bottom: 10px; }
@@ -27,7 +25,6 @@
         .google-btn img { width: 20px; }
         .auth-error { color: #e53935; font-size: 14px; margin-top: 15px; display: none; word-break: keep-all; line-height: 1.5; }
 
-        /* 검색창 및 카드 스타일 */
         .search-box { display: flex; gap: 10px; margin-bottom: 25px; background: #fff; padding: 12px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
         .search-box input { flex: 1; border: 1px solid #ddd; padding: 12px 16px; border-radius: 8px; font-size: 15px; outline: none; }
         .search-box input:focus { border-color: #3182f6; outline: 2px solid #3182f6; outline-offset: -1px; }
@@ -45,7 +42,6 @@
 </head>
 <body>
 
-<!-- 구글 로그인 모달 -->
 <div id="authOverlay" class="auth-overlay" role="dialog" aria-labelledby="modalTitle">
     <div class="auth-modal">
         <h2 id="modalTitle">🔒 링키지랩 사내 포탈</h2>
@@ -77,58 +73,69 @@
 
 <script>
     const SUPABASE_URL = 'https://cqrvqcsupdgsxgtpfxtd.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxcnZxY3N1cGRnc3hndHBfeHRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQwNzk3MjcsImV4cCI6MjA5OTY1NTcyN30.NCUfjIvijawwy3v-wSaQXyzEioo_GK50QseGVpqXIqU';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxcnZxY3N1cGRnc3hndHBmeHRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQwNzk3MjcsImV4cCI6MjA5OTY1NTcyN30.NCUfjIvijawwy3v-wSaQXyzEioo_GK50QseGVpqXIqU';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // 💡 1. 유저 계정 도메인 검증 및 로그인 상태 체크
     async function checkUserSession() {
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        
-        if (session) {
-            const email = session.user.email;
+        try {
+            const { data: { session } } = await supabaseClient.auth.getSession();
             
-            // 링키지랩 도메인 검증
-            if (email.endsWith('@linkagelab.co.kr')) {
-                document.getElementById('authOverlay').style.display = 'none';
-                document.getElementById('logoutBtn').style.display = 'block';
-                searchData(); // 인증 통과 시 데이터 로드
+            if (session) {
+                const email = session.user.email;
+                if (email && email.endsWith('@linkagelab.co.kr')) {
+                    document.getElementById('authOverlay').style.display = 'none';
+                    document.getElementById('logoutBtn').style.display = 'block';
+                    searchData();
+                } else {
+                    await supabaseClient.auth.signOut();
+                    showAuthError(`❌ <b>${email}</b><br/>링키지랩 사내 계정(@linkagelab.co.kr)만 접근할 수 있습니다.`);
+                }
             } else {
-                // 외부 계정이면 즉시 로그아웃 처리 및 에러 표시
-                await supabaseClient.auth.signOut();
-                document.getElementById('authError').innerHTML = `❌ <b>${email}</b><br/>링키지랩 사내 계정(@linkagelab.co.kr)만<br/>접근할 수 있습니다.`;
-                document.getElementById('authError').style.display = 'block';
                 document.getElementById('authOverlay').style.display = 'flex';
                 document.getElementById('logoutBtn').style.display = 'none';
             }
-        } else {
-            // 미로그인 상태
-            document.getElementById('authOverlay').style.display = 'flex';
-            document.getElementById('logoutBtn').style.display = 'none';
+        } catch (err) {
+            showAuthError(`세션 확인 중 오류: ${err.message}`);
         }
     }
 
-    // 💡 2. 구글 소셜 로그인 실행
     async function signInWithGoogle() {
-        await supabaseClient.auth.signInWithOAuth({
-            provider: 'google',
-            options: {
-                redirectTo: window.location.href // 로그인 후 현재 주소로 되돌아옴
+        const errorEl = document.getElementById('authError');
+        errorEl.style.display = 'none';
+        
+        try {
+            const { data, error } = await supabaseClient.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: 'http://localhost:3000'
+                }
+            });
+
+            if (error) {
+                showAuthError(`로그인 요청 실패: ${error.message}`);
             }
-        });
+        } catch (err) {
+            showAuthError(`오류 발생: ${err.message}`);
+        }
     }
 
-    // 💡 3. 로그아웃 기능
+    function showAuthError(msg) {
+        const errorEl = document.getElementById('authError');
+        errorEl.innerHTML = msg;
+        errorEl.style.display = 'block';
+        document.getElementById('authOverlay').style.display = 'flex';
+        document.getElementById('logoutBtn').style.display = 'none';
+    }
+
     async function signOut() {
         await supabaseClient.auth.signOut();
         window.location.reload();
     }
 
-    // 로그인 후 리디렉션 감지
-    supabaseClient.auth.onAuthStateChange((event, session) => {
+    supabaseClient.auth.onAuthStateChange((event) => {
         if (event === 'SIGNED_IN') checkUserSession();
     });
 
-    // 텍스트 하이라이트 함수
     function highlightText(text, keyword) {
         if (!keyword) return text;
         const escapedKeyword = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -136,7 +143,6 @@
         return text.replace(regex, '<mark>$1</mark>');
     }
 
-    // 데이터 검색 및 화면 렌더링 로직
     async function searchData() {
         const keyword = document.getElementById('searchInput').value.trim();
         const listEl = document.getElementById('announcementList');
@@ -170,7 +176,7 @@
         }, 300);
     }
 
-    checkUserSession(); // 최초 진입 시 실행
+    checkUserSession();
 </script>
 
 </body>
