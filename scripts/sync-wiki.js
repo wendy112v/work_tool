@@ -10,7 +10,6 @@ const PARENT_PAGE_ID = '1995026742';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// 🔍 "공지" 및 "공유" 섹션만 핀포인트 추출하는 함수
 function extractNoticeSections(fullHtml) {
     const $ = cheerio.load(fullHtml);
     let resultHtml = '';
@@ -32,7 +31,6 @@ function extractNoticeSections(fullHtml) {
     return resultHtml;
 }
 
-// ♾️ 개수 제한 없이 모든 하위 페이지를 싹 쓸어오는 재귀 호출 함수
 async function fetchAllChildPages(parentId) {
     let allPages = [];
     let start = 0;
@@ -57,11 +55,10 @@ async function fetchAllChildPages(parentId) {
         const pages = data.results || [];
         allPages = allPages.concat(pages);
 
-        // 가져온 데이터가 limit보다 적거나 다음 페이지 링크가 없으면 반복 종료
         if (pages.length < limit || !data._links?.next) {
             hasMore = false;
         } else {
-            start += limit; // 다음 50개를 가져오도록 위치 이동
+            start += limit;
         }
     }
 
@@ -70,11 +67,9 @@ async function fetchAllChildPages(parentId) {
 
 async function syncConfluencePages() {
     try {
-        console.log("🚀 회의록 동기화 시작...");
+        console.log("🚀 카카오 컨플루언스 회의록 전체 동기화 시작...");
 
-        // 개수 제한 없이 모든 하위 페이지 수집
         const pages = await fetchAllChildPages(PARENT_PAGE_ID);
-
         console.log(`📁 총 ${pages.length}개의 주간 회의록 하위 페이지를 발견했습니다.`);
 
         for (const page of pages) {
@@ -90,15 +85,35 @@ async function syncConfluencePages() {
 
             const today = new Date().toISOString().split('T')[0];
 
-            const { error } = await supabase
+            // 1. 동일한 제목의 데이터가 DB에 이미 있는지 확인
+            const { data: existing } = await supabase
                 .from('announcements')
-                .upsert({
-                    title: pageTitle,
-                    content: noticesOnlyHtml,
-                    category: 'general',
-                    date: today,
-                    tags: ['주간회의록', '카카오위키']
-                }, { onConflict: 'title' });
+                .select('id')
+                .eq('title', pageTitle)
+                .maybeSingle();
+
+            let error;
+            if (existing) {
+                // 2. 기존 데이터가 존재하면 내용 업데이트
+                ({ error } = await supabase
+                    .from('announcements')
+                    .update({
+                        content: noticesOnlyHtml,
+                        date: today
+                    })
+                    .eq('id', existing.id));
+            } else {
+                // 3. 새 데이터면 신규 등록
+                ({ error } = await supabase
+                    .from('announcements')
+                    .insert({
+                        title: pageTitle,
+                        content: noticesOnlyHtml,
+                        category: 'general',
+                        date: today,
+                        tags: ['주간회의록', '카카오위키']
+                    }));
+            }
 
             if (error) {
                 console.error(`❌ '${pageTitle}' DB 저장 실패:`, error.message);
