@@ -8,61 +8,127 @@
     <style>
         * { box-sizing: border-box; font-family: 'Pretendard', -apple-system, sans-serif; }
         body { background-color: #f5f6f8; margin: 0; padding: 20px; color: #333; }
-        .container { max-width: 900px; margin: 0 auto; }
-        header { text-align: center; margin-bottom: 25px; }
-        h1 { margin-bottom: 15px; color: #1e1e1e; font-size: 24px; }
+        .container { max-width: 900px; margin: 0 auto; position: relative; }
         
-        /* 스크린 리더에게만 읽히고 화면에서는 숨기는 접근성 전용 클래스 */
+        /* 상단 헤더 & 로그아웃 버튼 */
+        header { text-align: center; margin-bottom: 25px; position: relative; }
+        h1 { margin-bottom: 15px; color: #1e1e1e; font-size: 24px; }
+        .logout-btn { position: absolute; right: 0; top: 10px; background: none; border: none; color: #888; text-decoration: underline; cursor: pointer; font-size: 13px; display: none; }
+        .logout-btn:hover { color: #333; }
+        
         .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
 
-        /* 검색창 스타일 */
-        .search-box { display: flex; gap: 10px; margin-bottom: 25px; background: #fff; padding: 12px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-        .search-box input { flex: 1; border: 1px solid #ddd; padding: 12px 16px; border-radius: 8px; font-size: 15px; outline: none; transition: border 0.2s; }
-        .search-box input:focus { border-color: #3182f6; outline: 2px solid #3182f6; outline-offset: -1px; }
-        .search-box button { background: #3182f6; color: white; border: none; padding: 0 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
-        .search-box button:hover, .search-box button:focus { background: #1b64da; outline: 2px solid #114bb5; outline-offset: 2px; }
+        /* 구글 로그인 모달 */
+        .auth-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .auth-modal { background: white; padding: 40px 30px; border-radius: 16px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .auth-modal h2 { margin-top: 0; font-size: 22px; color: #1e1e1e; margin-bottom: 10px; }
+        .google-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 12px; margin-top: 25px; background: #fff; color: #333; border: 1px solid #ccc; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: background 0.2s; }
+        .google-btn:hover { background: #f9f9f9; }
+        .google-btn img { width: 20px; }
+        .auth-error { color: #e53935; font-size: 14px; margin-top: 15px; display: none; word-break: keep-all; line-height: 1.5; }
 
-        /* 카드 및 콘텐츠 스타일 */
+        /* 검색창 및 카드 스타일 */
+        .search-box { display: flex; gap: 10px; margin-bottom: 25px; background: #fff; padding: 12px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .search-box input { flex: 1; border: 1px solid #ddd; padding: 12px 16px; border-radius: 8px; font-size: 15px; outline: none; }
+        .search-box input:focus { border-color: #3182f6; outline: 2px solid #3182f6; outline-offset: -1px; }
+        .search-box button { background: #3182f6; color: white; border: none; padding: 0 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        
         .card { background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.04); }
         .card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f0f0f0; padding-bottom: 12px; margin-bottom: 16px; }
-        
         .card-title { font-size: 18px; font-weight: bold; color: #222; margin: 0; }
         .card-date { font-size: 13px; color: #888; }
         .card-body { line-height: 1.7; font-size: 15px; word-break: break-all; }
         .card-body img { max-width: 100% !important; height: auto !important; border-radius: 8px; margin: 12px 0; }
         .no-result { text-align: center; padding: 50px; color: #777; background: white; border-radius: 12px; }
-        
-        /* 하이라이트(형광펜) 효과 - 명도대비(Contrast) 준수 색상 */
         mark { background-color: #ffeb3b; padding: 2px 4px; border-radius: 3px; font-weight: bold; color: #000; }
     </style>
 </head>
 <body>
 
+<!-- 구글 로그인 모달 -->
+<div id="authOverlay" class="auth-overlay" role="dialog" aria-labelledby="modalTitle">
+    <div class="auth-modal">
+        <h2 id="modalTitle">🔒 링키지랩 사내 포탈</h2>
+        <p style="font-size: 14px; color: #666; margin: 0;">사내 크루 전용 페이지입니다.<br/>@linkagelab.co.kr 계정으로 로그인해 주세요.</p>
+        
+        <button type="button" class="google-btn" onclick="signInWithGoogle()">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="">
+            Google 계정으로 로그인
+        </button>
+        <div id="authError" class="auth-error" role="alert"></div>
+    </div>
+</div>
+
 <div class="container">
     <header>
-        <h1>📋 접근성 2파트 공지사항</h1>
+        <h1>📋 주간 회의록 공지/공유사항</h1>
+        <button id="logoutBtn" class="logout-btn" onclick="signOut()">로그아웃</button>
     </header>
 
-    <!-- 검색 영역 -->
     <div class="search-box">
-        <label for="searchInput" class="sr-only">검색어 입력 (예: 명도대비, 대체텍스트)</label>
+        <label for="searchInput" class="sr-only">검색어 입력</label>
         <input type="text" id="searchInput" placeholder="검색어를 입력하세요 (예: 명도대비, 대체텍스트...)" onkeydown="if(event.key === 'Enter') searchData()">
         <button type="button" onclick="searchData()">검색</button>
     </div>
 
-    <!-- 💡 센스리더 호환성 강화: role="alert" 추가 및 assertive 적용 -->
     <div id="aria-status" class="sr-only" role="alert" aria-live="assertive" aria-atomic="true"></div>
-
-    <!-- 결과 리스트 -->
     <main id="announcementList"></main>
 </div>
 
 <script>
     const SUPABASE_URL = 'https://cqrvqcsupdgsxgtpfxtd.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxcnZxY3N1cGRnc3hndHBmeHRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQwNzk3MjcsImV4cCI6MjA5OTY1NTcyN30.NCUfjIvijawwy3v-wSaQXyzEioo_GK50QseGVpqXIqU';
-    
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxcnZxY3N1cGRnc3hndHBfeHRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQwNzk3MjcsImV4cCI6MjA5OTY1NTcyN30.NCUfjIvijawwy3v-wSaQXyzEioo_GK50QseGVpqXIqU';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    // 💡 1. 유저 계정 도메인 검증 및 로그인 상태 체크
+    async function checkUserSession() {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        
+        if (session) {
+            const email = session.user.email;
+            
+            // 링키지랩 도메인 검증
+            if (email.endsWith('@linkagelab.co.kr')) {
+                document.getElementById('authOverlay').style.display = 'none';
+                document.getElementById('logoutBtn').style.display = 'block';
+                searchData(); // 인증 통과 시 데이터 로드
+            } else {
+                // 외부 계정이면 즉시 로그아웃 처리 및 에러 표시
+                await supabaseClient.auth.signOut();
+                document.getElementById('authError').innerHTML = `❌ <b>${email}</b><br/>링키지랩 사내 계정(@linkagelab.co.kr)만<br/>접근할 수 있습니다.`;
+                document.getElementById('authError').style.display = 'block';
+                document.getElementById('authOverlay').style.display = 'flex';
+                document.getElementById('logoutBtn').style.display = 'none';
+            }
+        } else {
+            // 미로그인 상태
+            document.getElementById('authOverlay').style.display = 'flex';
+            document.getElementById('logoutBtn').style.display = 'none';
+        }
+    }
+
+    // 💡 2. 구글 소셜 로그인 실행
+    async function signInWithGoogle() {
+        await supabaseClient.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+                redirectTo: window.location.href // 로그인 후 현재 주소로 되돌아옴
+            }
+        });
+    }
+
+    // 💡 3. 로그아웃 기능
+    async function signOut() {
+        await supabaseClient.auth.signOut();
+        window.location.reload();
+    }
+
+    // 로그인 후 리디렉션 감지
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+        if (event === 'SIGNED_IN') checkUserSession();
+    });
+
+    // 텍스트 하이라이트 함수
     function highlightText(text, keyword) {
         if (!keyword) return text;
         const escapedKeyword = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -70,63 +136,41 @@
         return text.replace(regex, '<mark>$1</mark>');
     }
 
+    // 데이터 검색 및 화면 렌더링 로직
     async function searchData() {
         const keyword = document.getElementById('searchInput').value.trim();
         const listEl = document.getElementById('announcementList');
         const ariaStatus = document.getElementById('aria-status');
         
-        // 검색 시작 전 기존 안내 텍스트 초기화 (센스리더가 변화를 확실히 감지하게 함)
         ariaStatus.textContent = '';
         listEl.innerHTML = '<div class="no-result">데이터를 불러오는 중입니다...</div>';
 
         let query = supabaseClient.from('announcements').select('*').order('id', { ascending: false });
-
-        if (keyword !== '') {
-            query = query.or(`title.ilike.%${keyword}%,content.ilike.%${keyword}%`);
-        }
+        if (keyword !== '') query = query.or(`title.ilike.%${keyword}%,content.ilike.%${keyword}%`);
 
         const { data, error } = await query;
 
-        if (error) {
-            listEl.innerHTML = `<div class="no-result">❌ 오류가 발생했습니다: ${error.message}</div>`;
-            setTimeout(() => { ariaStatus.textContent = '데이터를 불러오는 중 오류가 발생했습니다.'; }, 300);
+        if (error || !data || data.length === 0) {
+            listEl.innerHTML = `<div class="no-result">🔍 결과가 없습니다.</div>`;
             return;
         }
 
-        if (!data || data.length === 0) {
-            listEl.innerHTML = `<div class="no-result">🔍 '${keyword}' 검색 결과가 없습니다.</div>`;
-            setTimeout(() => { ariaStatus.textContent = `검색어 ${keyword}에 대한 결과가 없습니다.`; }, 300);
-            return;
-        }
+        listEl.innerHTML = data.map(item => `
+            <section class="card">
+                <div class="card-header">
+                    <h2 class="card-title">${highlightText(item.title, keyword)}</h2>
+                    <span class="card-date">${item.date || ''}</span>
+                </div>
+                <div class="card-body">${highlightText(item.content, keyword)}</div>
+            </section>
+        `).join('');
 
-        listEl.innerHTML = data.map(item => {
-            const highlightedTitle = highlightText(item.title, keyword);
-            const highlightedContent = highlightText(item.content, keyword);
-            
-            return `
-                <section class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">${highlightedTitle}</h2>
-                        <span class="card-date">${item.date || ''}</span>
-                    </div>
-                    <div class="card-body">
-                        ${highlightedContent}
-                    </div>
-                </section>
-            `;
-        }).join('');
-
-        // 💡 0.3초(300ms) 딜레이를 주어 센스리더가 DOM 변화를 확실하게 캐치하고 읽도록 처리
         setTimeout(() => {
-            if(keyword === '') {
-                ariaStatus.textContent = `총 ${data.length}개의 회의록을 불러왔습니다.`;
-            } else {
-                ariaStatus.textContent = `검색어 ${keyword}에 대한 결과가 ${data.length}건 있습니다.`;
-            }
+            ariaStatus.textContent = keyword === '' ? `총 ${data.length}건.` : `검색 결과 ${data.length}건.`;
         }, 300);
     }
 
-    searchData();
+    checkUserSession(); // 최초 진입 시 실행
 </script>
 
 </body>
