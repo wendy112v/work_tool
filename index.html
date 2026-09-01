@@ -10,26 +10,32 @@
         body { background-color: #f5f6f8; margin: 0; padding: 20px; color: #333; }
         .container { max-width: 900px; margin: 0 auto; }
         header { text-align: center; margin-bottom: 25px; }
-        h1 { margin-bottom: 15px; color: #1e1e1e; }
+        h1 { margin-bottom: 15px; color: #1e1e1e; font-size: 24px; }
         
+        /* 스크린 리더에게만 읽히고 화면에서는 숨기는 접근성 전용 클래스 */
+        .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+
         /* 검색창 스타일 */
         .search-box { display: flex; gap: 10px; margin-bottom: 25px; background: #fff; padding: 12px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
         .search-box input { flex: 1; border: 1px solid #ddd; padding: 12px 16px; border-radius: 8px; font-size: 15px; outline: none; transition: border 0.2s; }
-        .search-box input:focus { border-color: #3182f6; }
+        /* 시력 보호 및 포커스 명확화를 위해 outline 색상 강화 */
+        .search-box input:focus { border-color: #3182f6; outline: 2px solid #3182f6; outline-offset: -1px; }
         .search-box button { background: #3182f6; color: white; border: none; padding: 0 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
-        .search-box button:hover { background: #1b64da; }
+        .search-box button:hover, .search-box button:focus { background: #1b64da; outline: 2px solid #114bb5; outline-offset: 2px; }
 
         /* 카드 및 콘텐츠 스타일 */
         .card { background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.04); }
         .card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f0f0f0; padding-bottom: 12px; margin-bottom: 16px; }
-        .card-title { font-size: 18px; font-weight: bold; color: #222; }
+        
+        /* 웹 접근성: h2 태그를 사용하되 디자인은 이전과 동일하게 유지 */
+        .card-title { font-size: 18px; font-weight: bold; color: #222; margin: 0; }
         .card-date { font-size: 13px; color: #888; }
         .card-body { line-height: 1.7; font-size: 15px; word-break: break-all; }
         .card-body img { max-width: 100% !important; height: auto !important; border-radius: 8px; margin: 12px 0; }
         .no-result { text-align: center; padding: 50px; color: #777; background: white; border-radius: 12px; }
         
-        /* 하이라이트(형광펜) 효과 */
-        mark { background-color: #ffe066; padding: 2px 4px; border-radius: 3px; font-weight: bold; color: #000; }
+        /* 하이라이트(형광펜) 효과 - 명도대비(Contrast) 준수 색상 */
+        mark { background-color: #ffeb3b; padding: 2px 4px; border-radius: 3px; font-weight: bold; color: #000; }
     </style>
 </head>
 <body>
@@ -41,23 +47,25 @@
 
     <!-- 검색 영역 -->
     <div class="search-box">
+        <!-- 웹 접근성: 스크린리더를 위한 라벨(Label) 제공 -->
+        <label for="searchInput" class="sr-only">검색어 입력 (예: 명도대비, 인적분할)</label>
         <input type="text" id="searchInput" placeholder="검색어를 입력하세요 (예: 명도대비, 인적분할...)" onkeydown="if(event.key === 'Enter') searchData()">
-        <button onclick="searchData()">검색</button>
+        <button type="button" onclick="searchData()">검색</button>
     </div>
 
+    <!-- 웹 접근성: 스크린리더가 화면 변경(검색 결과)을 감지하고 즉시 읽어주는 영역 (aria-live) -->
+    <div id="aria-status" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
     <!-- 결과 리스트 -->
-    <div id="announcementList"></div>
+    <main id="announcementList"></main>
 </div>
 
 <script>
-    // Supabase 접속 정보
     const SUPABASE_URL = 'https://cqrvqcsupdgsxgtpfxtd.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxcnZxY3N1cGRnc3hndHBmeHRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQwNzk3MjcsImV4cCI6MjA5OTY1NTcyN30.NCUfjIvijawwy3v-wSaQXyzEioo_GK50QseGVpqXIqU';
     
-    // 💡 에러 원인 수정 완료: 변수명 충돌 방지
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // 텍스트 하이라이트 함수
     function highlightText(text, keyword) {
         if (!keyword) return text;
         const escapedKeyword = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -65,13 +73,14 @@
         return text.replace(regex, '<mark>$1</mark>');
     }
 
-    // 데이터 불러오기 및 검색 실행
     async function searchData() {
         const keyword = document.getElementById('searchInput').value.trim();
         const listEl = document.getElementById('announcementList');
+        const ariaStatus = document.getElementById('aria-status');
+        
         listEl.innerHTML = '<div class="no-result">데이터를 불러오는 중입니다...</div>';
+        ariaStatus.textContent = '데이터를 불러오는 중입니다.'; // 스크린리더 음성 안내
 
-        // 💡 수정된 부분: supabaseClient 사용
         let query = supabaseClient.from('announcements').select('*').order('id', { ascending: false });
 
         if (keyword !== '') {
@@ -82,31 +91,40 @@
 
         if (error) {
             listEl.innerHTML = `<div class="no-result">❌ 오류가 발생했습니다: ${error.message}</div>`;
+            ariaStatus.textContent = '오류가 발생했습니다.';
             return;
         }
 
         if (!data || data.length === 0) {
             listEl.innerHTML = `<div class="no-result">🔍 '${keyword}' 검색 결과가 없습니다.</div>`;
+            ariaStatus.textContent = `검색어 ${keyword}에 대한 결과가 없습니다.`;
             return;
         }
 
-        // 화면에 카드 형태로 그리기
+        // 웹 접근성: 시각장애인이 'H'키로 제목 간 이동을 할 수 있도록 <h2 class="card-title"> 적용
         listEl.innerHTML = data.map(item => {
             const highlightedTitle = highlightText(item.title, keyword);
             const highlightedContent = highlightText(item.content, keyword);
             
             return `
-                <div class="card">
+                <section class="card">
                     <div class="card-header">
-                        <span class="card-title">${highlightedTitle}</span>
+                        <h2 class="card-title">${highlightedTitle}</h2>
                         <span class="card-date">${item.date || ''}</span>
                     </div>
                     <div class="card-body">
                         ${highlightedContent}
                     </div>
-                </div>
+                </section>
             `;
         }).join('');
+
+        // 스크린리더가 검색 결과를 즉시 읽어줌
+        if(keyword === '') {
+            ariaStatus.textContent = `총 ${data.length}개의 회의록을 불러왔습니다.`;
+        } else {
+            ariaStatus.textContent = `검색어 ${keyword}에 대한 결과가 ${data.length}건 있습니다.`;
+        }
     }
 
     // 페이지 최초 접속 시 전체 목록 로드
